@@ -1,578 +1,546 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Patient Concierge AI – Implant Leads</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Patient Concierge AI — Dental Booking</title>
+  <meta name="description" content="A 24/7 dental booking concierge that captures patient details and emails the clinic instantly." />
   <style>
     :root{
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#475569;
-      --line:#e6edf6;
-      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-      --bot:#eef2ff;
-      --user:#eafff2;
-      --accent:#0ea5e9;
-      --accent2:#22c55e;
-      --btn:#0f172a;
+      --bg:#0b1220;
+      --card:#0f172a;
+      --card2:#111c33;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --brand:#38bdf8;
+      --brand2:#22c55e;
+      --danger:#ef4444;
+      --border:rgba(148,163,184,.18);
+      --shadow:0 20px 60px rgba(0,0,0,.45);
+      --radius:18px;
     }
-    *{ box-sizing:border-box; }
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(1000px 600px at 20% 10%, #eaf3ff 0%, transparent 55%),
-                  radial-gradient(900px 500px at 90% 20%, #e7fff1 0%, transparent 50%),
-                  var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(900px 650px at 25% 10%, rgba(56,189,248,.18), transparent 60%),
+        radial-gradient(900px 650px at 80% 10%, rgba(34,197,94,.14), transparent 60%),
+        linear-gradient(180deg,#070b14,#0b1220);
       color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
     }
-    .wrap{ max-width:820px; margin:0 auto; padding:22px; }
     .shell{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:18px;
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width:900px){ .shell{grid-template-columns:1fr} }
+    .panel{
+      background:linear-gradient(180deg,var(--card),var(--card2));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-    .top{
-      padding:18px 18px 12px 18px;
-      border-bottom:1px solid var(--line);
-      background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    .head{
+      padding:16px 16px 14px;
+      border-bottom:1px solid var(--border);
       display:flex;
-      gap:14px;
-      align-items:flex-start;
+      align-items:center;
       justify-content:space-between;
-      flex-wrap:wrap;
-    }
-    .brand{ display:flex; gap:12px; align-items:center; }
-    .mark{
-      width:44px; height:44px;
-      border-radius:14px;
-      background: linear-gradient(135deg, var(--accent), #0b3b76);
-      box-shadow: 0 10px 20px rgba(14,165,233,0.25);
-      display:flex; align-items:center; justify-content:center;
-      color:#fff; font-weight:800; letter-spacing:0.5px;
-    }
-    .titleBlock h1{ margin:0; font-size:16px; line-height:1.2; }
-    .titleBlock p{
-      margin:6px 0 0 0;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.4;
-      max-width:560px;
-    }
-    .tag{
-      margin-top:2px;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      color:#0b3b76;
-      background:#eaf6ff;
-      border:1px solid #d8efff;
-      padding:8px 10px;
-      border-radius:999px;
-      white-space:nowrap;
-    }
-    .dot{
-      width:8px; height:8px;
-      border-radius:999px;
-      background:var(--accent2);
-      box-shadow:0 0 0 4px rgba(34,197,94,0.15);
-    }
-    .clinicCard{
-      margin:14px 18px 0 18px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px 14px;
-      background:#f8fbff;
-      display:flex;
-      gap:12px;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-    .clinicLeft{ display:flex; flex-direction:column; gap:4px; }
-    .clinicName{ font-weight:800; font-size:13px; }
-    .clinicMeta{ font-size:12px; color:var(--muted); }
-    .privacy{
-      font-size:12px;
-      color:var(--muted);
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-    .shield{
-      width:18px; height:18px;
-      border-radius:6px;
-      background:#e7fff1;
-      border:1px solid #c9f6da;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:12px;
-    }
-    .main{ padding:14px 18px 18px 18px; }
-    .chat{
-      display:flex;
-      flex-direction:column;
       gap:10px;
-      padding:8px 0 10px 0;
-      min-height:270px;
     }
-    .msg{
-      max-width:86%;
-      padding:12px 14px;
-      border-radius:14px;
-      line-height:1.25;
-      font-size:14px;
-      white-space:pre-wrap;
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      font-weight:900;
+      letter-spacing:.2px;
     }
-    .bot{ background:var(--bot); align-self:flex-start; border:1px solid #e3e7ff; }
-    .user{ background:var(--user); align-self:flex-end; border:1px solid #c9f6da; }
-
-    .controls{ margin-top:6px; }
-    .actions{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
-    button{
-      border:0;
-      padding:10px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      background:var(--btn);
-      color:white;
-      font-size:14px;
+    .logo{
+      width:36px;height:36px;border-radius:12px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg,#2563eb,#38bdf8);
+      color:#fff;font-weight:1000;
     }
-    button.secondary{
-      background:#fff;
-      color:var(--text);
-      border:1px solid var(--line);
-    }
-    button.success{ background:var(--accent2); }
-
-    input{
-      width:100%;
-      padding:12px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      font-size:14px;
-      outline:none;
-      background:#fff;
-    }
-    input:focus{
-      border-color:#b7dcf4;
-      box-shadow: 0 0 0 4px rgba(14,165,233,0.12);
-    }
-
-    .fineprint{
-      margin-top:10px;
+    .pill{
       font-size:12px;
       color:var(--muted);
-      line-height:1.4;
-      border-top:1px solid var(--line);
-      padding-top:10px;
+      padding:6px 10px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background:rgba(15,23,42,.45);
     }
-    .successBox{
-      border:1px solid #c9f6da;
-      background:#eafff2;
-      border-radius:14px;
-      padding:14px;
-      margin-top:10px;
-      color:#064e3b;
+    .subhead{
+      padding:14px 16px;
+      color:var(--muted);
       font-size:13px;
       line-height:1.45;
     }
+
+    .chat{
+      height:520px;
+      padding:16px;
+      overflow:auto;
+    }
+    .row{display:flex; margin:10px 0}
+    .bot{justify-content:flex-start}
+    .you{justify-content:flex-end}
+    .bubble{
+      max-width:82%;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:13px;
+      line-height:1.35;
+      border:1px solid var(--border);
+    }
+    .bubble.bot{
+      background:rgba(59,130,246,.10);
+    }
+    .bubble.you{
+      background:rgba(34,197,94,.12);
+    }
+    .choices{
+      display:flex;flex-wrap:wrap;gap:8px;margin-top:10px
+    }
+    .choice{
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:10px 10px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:13px;
+      transition:transform .08s ease, filter .2s ease;
+    }
+    .choice:hover{transform:translateY(-1px);filter:brightness(1.03)}
+    .choice.primary{border-color:rgba(56,189,248,.45)}
+    .choice.green{border-color:rgba(34,197,94,.45)}
+    .choice.red{border-color:rgba(239,68,68,.45)}
+
+    .inputBar{
+      padding:14px 16px;
+      border-top:1px solid var(--border);
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    input{
+      flex:1;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 12px;
+      color:var(--text);
+      outline:none;
+      font-size:13px;
+    }
+    input::placeholder{color:rgba(148,163,184,.8)}
+    button{
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      background:linear-gradient(135deg,#2563eb,#38bdf8);
+      color:#fff;
+      font-weight:950;
+      cursor:pointer;
+      transition:transform .08s ease, filter .2s ease;
+    }
+    button:hover{transform:translateY(-1px);filter:brightness(1.03)}
+    button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+    /* Right panel (demo + info) */
+    .demoBox{padding:16px}
+    .demoTitle{font-weight:950;font-size:14px;margin-bottom:6px}
+    .demoText{color:var(--muted);font-size:13px;line-height:1.45;margin-bottom:12px}
+    .demoRow{display:flex;gap:10px;flex-wrap:wrap}
+    .miniBtn{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .miniBtn:hover{filter:brightness(1.05)}
+    .notice{
+      margin-top:12px;
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:rgba(15,23,42,.35);
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
+    }
+    .ok{color:#86efac;font-weight:900}
+    .warn{color:#fde68a;font-weight:900}
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <div class="shell">
-      <div class="top">
+  <div class="shell">
+    <div class="panel">
+      <div class="head">
         <div class="brand">
-          <div class="mark">PC</div>
-          <div class="titleBlock">
-            <h1>Patient Concierge AI – Implant Leads</h1>
-            <p id="subtitle">
-              A clinic-grade assistant that gathers the key implant consultation details in under 60 seconds,
-              then submits them securely so the clinic can call and confirm.
-            </p>
+          <div class="logo">PC</div>
+          <div>
+            Patient Concierge AI<br>
+            <span style="color:var(--muted);font-size:12px;font-weight:700">Dental booking concierge</span>
           </div>
         </div>
-        <div class="tag"><span class="dot"></span> 24/7 Intake Assistant</div>
+        <div class="pill">● Online</div>
+      </div>
+      <div class="subhead" id="subheadText">
+        Answer a few quick questions and we’ll send your request to the clinic.
       </div>
 
-      <div class="clinicCard">
-        <div class="clinicLeft">
-          <div class="clinicName" id="clinicName">Demo Dental Clinic</div>
-          <div class="clinicMeta" id="clinicMeta">Implant consultations • Nairobi</div>
+      <div class="chat" id="chat"></div>
+
+      <div class="inputBar">
+        <input id="textInput" placeholder="Type here…" />
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="head">
+        <div class="brand">
+          <div class="logo" style="background:linear-gradient(135deg,#16a34a,#22c55e)">✓</div>
+          <div>
+            Demo mode<br>
+            <span style="color:var(--muted);font-size:12px;font-weight:700">Send the lead to your email</span>
+          </div>
         </div>
-        <div class="privacy">
-          <span class="shield">🔒</span>
-          <span>Private & confidential. For consultation requests only.</span>
-        </div>
+        <div class="pill">Demo</div>
       </div>
 
-      <div class="main">
-        <div id="chat" class="chat"></div>
-        <div id="controls" class="controls"></div>
-        <div class="fineprint">
-          Final suitability and exact pricing are confirmed during an in-person clinical examination.
-          If you have severe pain, swelling, fever, or bleeding, contact the clinic immediately.
+      <div class="demoBox">
+        <div class="demoTitle">How the demo works</div>
+        <div class="demoText">
+          You enter your clinic email below, complete the chat, and we’ll send you the lead summary instantly.
+        </div>
+
+        <div class="demoRow">
+          <input id="demoEmail" placeholder="Clinic email (demo)" />
+          <button id="demoStartBtn" style="background:linear-gradient(135deg,#7c3aed,#2563eb)">Start demo</button>
+        </div>
+
+        <div class="notice" id="noticeBox">
+          <span class="warn">Tip:</span> Use demo to show dentists that the chatbot really sends the full details to their email.
         </div>
       </div>
     </div>
   </div>
+    <script>
+    // ================================
+    // ✅ CONFIG (YOUR GOOGLE SCRIPT URL)
+    // ================================
+    // This is your existing Apps Script web app URL (mailer)
+    const MAILER_URL = "https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec";
 
-<script>
-(function () {
-  "use strict";
+    // Demo mode enabled when user clicks "Start demo"
+    let DEMO_MODE = false;
 
-  // ----------------- DEMO MODE -----------------
-  // Demo:    https://maweofc-del.github.io/patient-concierge-ai/?demo=1
-  // Normal:  https://maweofc-del.github.io/patient-concierge-ai/
-  var params = new URLSearchParams(window.location.search);
-  var DEMO_MODE = (params.get("demo") === "1");
-
-  // ----------------- CLINIC BRANDING -----------------
-  var CLINIC = {
-    name: "Demo Dental Clinic",
-    meta: "Implant consultations • Nairobi"
-  };
-
-  document.getElementById("clinicName").textContent = CLINIC.name;
-  document.getElementById("clinicMeta").textContent = CLINIC.meta;
-
-  if (DEMO_MODE) {
-    document.getElementById("subtitle").textContent =
-      "Demo mode: enter your email to receive the lead summary after submission, then try the chatbot like a patient.";
-  }
-
-  // ----------------- GOOGLE FORM CONFIG (Sheets) -----------------
-  var FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/viewform";
-  var FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/formResponse";
-
-  // Your form field IDs (you already have these working)
-  var ENTRY = {
-    name: "entry.98128128",
-    phone: "entry.1541422852",
-    email: "entry.1254364814",
-    interest: "entry.1614899485",
-    missingDuration: "entry.458020986",
-    pain: "entry.389541324",
-    timeline: "entry.539871036",
-    prefTime: "entry.156682484",
-    notes: "entry.1367604722"
-  };
-
-  // ----------------- APPS SCRIPT MAILER -----------------
-  // This is your deployed Apps Script Web App URL
-  var MAILER_URL = "https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec";
-
-  // ----------------- UI HELPERS -----------------
-  var chat = document.getElementById("chat");
-  var controls = document.getElementById("controls");
-
-  var state = {
-    demoEmail: null,
-    interest: null,
-    missingDuration: null,
-    pain: null,
-    timeline: null,
-    prefTime: null,
-    name: null,
-    phone: null,
-    email: null
-  };
-
-  function addMsg(text, who) {
-    if (!who) who = "bot";
-    var div = document.createElement("div");
-    div.className = "msg " + who;
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  function setButtons(options, onPick) {
-    controls.innerHTML = "";
-    var wrap = document.createElement("div");
-    wrap.className = "actions";
-
-    options.forEach(function (opt) {
-      var b = document.createElement("button");
-      b.textContent = opt.label;
-      if (opt.className) b.className = opt.className;
-      b.onclick = function () { onPick(opt.value); };
-      wrap.appendChild(b);
-    });
-
-    controls.appendChild(wrap);
-  }
-
-  function setInput(placeholder, onSubmit) {
-    controls.innerHTML = "";
-
-    var input = document.createElement("input");
-    input.placeholder = placeholder;
-    input.autocomplete = "off";
-
-    var wrap = document.createElement("div");
-    wrap.className = "actions";
-
-    var btn = document.createElement("button");
-    btn.textContent = "Send";
-
-    btn.onclick = function () {
-      var v = (input.value || "").trim();
-      if (!v) return;
-      onSubmit(v);
+    // Conversation state (Option A: service + core details)
+    const state = {
+      clinicEmail: "",
+      service: "",
+      name: "",
+      phone: "",
+      email: "",
+      preferredTime: "",
+      notes: ""
     };
 
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Enter") btn.click();
-    });
+    // Simple services list (general dental booking)
+    const SERVICES = [
+      "General Checkup / Cleaning",
+      "Tooth Pain / Emergency",
+      "Braces / Invisalign",
+      "Whitening",
+      "Extraction",
+      "Filling / Root Canal",
+      "Implants",
+      "Kids Dentistry",
+      "Other"
+    ];
 
-    wrap.appendChild(input);
-    wrap.appendChild(btn);
-    controls.appendChild(wrap);
-    input.focus();
-  }
+    // DOM refs
+    const chatEl = document.getElementById("chat");
+    const textInput = document.getElementById("textInput");
+    const sendBtn = document.getElementById("sendBtn");
 
-  function isEmailLike(v) {
-    return v.indexOf("@") > 0 && v.indexOf(".") > 0;
-  }
+    const demoEmailEl = document.getElementById("demoEmail");
+    const demoStartBtn = document.getElementById("demoStartBtn");
+    const noticeBox = document.getElementById("noticeBox");
 
-  // ----------------- DEMO EMAIL STEP -----------------
-  function demoAskEmail() {
-    addMsg("👋 Demo mode: What email should receive the lead summary after submission?");
-    setInput("Type your email…", function (v) {
-      if (!isEmailLike(v)) {
-        addMsg("That doesn’t look like an email. Please type a valid email (example: clinic@gmail.com).");
-        demoAskEmail();
-        return;
-      }
-      state.demoEmail = v;
-      addMsg(v, "user");
-      addMsg("Perfect ✅ Now try the chatbot like a patient so you can see the full workflow.");
-      startPatientFlow();
-    });
-  }
+    // Helpers
+    function scrollToBottom(){
+      chatEl.scrollTop = chatEl.scrollHeight;
+    }
 
-  // ----------------- PATIENT FLOW -----------------
-  function startPatientFlow() {
-    addMsg("Hi 👋 I’m the clinic’s intake assistant. I’ll help you request an implant consultation.");
-    addMsg("Is this for one missing tooth or more?");
+    function addMsg(text, who="bot"){
+      const row = document.createElement("div");
+      row.className = "row " + (who === "bot" ? "bot" : "you");
 
-    setButtons([
-      { label: "One tooth implant", value: "One tooth implant" },
-      { label: "Multiple teeth implants", value: "Multiple teeth implants" },
-      { label: "Full mouth implants / dentures", value: "Full mouth implants / dentures" }
-    ], function (v) {
-      state.interest = v;
-      addMsg(v, "user");
-      stepDuration();
-    });
-  }
+      const bubble = document.createElement("div");
+      bubble.className = "bubble " + (who === "bot" ? "bot" : "you");
+      bubble.textContent = text;
 
-  function stepDuration() {
-    addMsg("How long have the teeth been missing?");
-    setButtons([
-      { label: "Under 3 months", value: "Under 3 months" },
-      { label: "3–12 months", value: "3–12 months" },
-      { label: "1+ years", value: "1+ years" }
-    ], function (v) {
-      state.missingDuration = v;
-      addMsg(v, "user");
-      stepPain();
-    });
-  }
+      row.appendChild(bubble);
+      chatEl.appendChild(row);
+      scrollToBottom();
+    }
 
-  function stepPain() {
-    addMsg("Are you currently experiencing pain or swelling?");
-    setButtons([
-      { label: "Yes", value: "Yes" },
-      { label: "No", value: "No" },
-      { label: "Not sure", value: "Not sure" }
-    ], function (v) {
-      state.pain = v;
-      addMsg(v, "user");
-      stepTimeline();
-    });
-  }
+    function addChoices(promptText, choices, opts={}){
+      addMsg(promptText, "bot");
 
-  function stepTimeline() {
-    addMsg("When would you like your consultation?");
-    setButtons([
-      { label: "ASAP", value: "ASAP" },
-      { label: "This week", value: "This week" },
-      { label: "Next week", value: "Next week" },
-      { label: "Not sure yet", value: "Not sure yet" }
-    ], function (v) {
-      state.timeline = v;
-      addMsg(v, "user");
-      stepPrefTime();
-    });
-  }
+      const row = document.createElement("div");
+      row.className = "row bot";
 
-  function stepPrefTime() {
-    addMsg("Preferred appointment time?");
-    setButtons([
-      { label: "Morning", value: "Morning" },
-      { label: "Afternoon", value: "Afternoon" },
-      { label: "Evening", value: "Evening" }
-    ], function (v) {
-      state.prefTime = v;
-      addMsg(v, "user");
-      stepName();
-    });
-  }
+      const wrap = document.createElement("div");
+      wrap.className = "bubble bot";
+      wrap.style.background = "rgba(15,23,42,.25)";
 
-  function stepName() {
-    addMsg("Great ✅ What’s your full name?");
-    setInput("Type your name…", function (v) {
-      state.name = v;
-      addMsg(v, "user");
-      stepPhone();
-    });
-  }
+      const choiceWrap = document.createElement("div");
+      choiceWrap.className = "choices";
 
-  function stepPhone() {
-    addMsg("What’s the best phone/WhatsApp number to confirm your consultation?");
-    setInput("Type your phone number…", function (v) {
-      state.phone = v;
-      addMsg(v, "user");
-      stepEmail();
-    });
-  }
-
-  function stepEmail() {
-    addMsg("Optional: your email (for confirmation). Type 'skip' to continue.");
-    setInput("Type your email or 'skip'…", function (v) {
-      if (String(v).toLowerCase() !== "skip") state.email = v;
-      addMsg(v, "user");
-      finish();
-    });
-  }
-
-  // ----------------- SUBMIT TO GOOGLE FORM (SHEETS) -----------------
-  function submitToGoogleForm(done, fail) {
-    try {
-      var payload = new URLSearchParams();
-      payload.append(ENTRY.name, state.name || "");
-      payload.append(ENTRY.phone, state.phone || "");
-      payload.append(ENTRY.email, state.email || "");
-      payload.append(ENTRY.interest, state.interest || "");
-      payload.append(ENTRY.missingDuration, state.missingDuration || "");
-      payload.append(ENTRY.pain, state.pain || "");
-      payload.append(ENTRY.timeline, state.timeline || "");
-      payload.append(ENTRY.prefTime, state.prefTime || "");
-      payload.append(ENTRY.notes, "Submitted via Patient Concierge AI");
-
-      fetch(FORM_RESPONSE_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: payload.toString()
-      }).then(function () {
-        done();
-      }).catch(function (e) {
-        fail(e);
+      choices.forEach((label) => {
+        const btn = document.createElement("button");
+        btn.className = "choice " + (opts.className || "");
+        btn.textContent = label;
+        btn.onclick = () => opts.onPick && opts.onPick(label);
+        choiceWrap.appendChild(btn);
       });
-    } catch (e) {
-      fail(e);
-    }
-  }
 
-  // ----------------- DEMO EMAIL SENDER -----------------
-  function sendDemoEmailIfNeeded(done) {
-    if (!DEMO_MODE || !state.demoEmail) {
-      done();
-      return;
+      wrap.appendChild(choiceWrap);
+      row.appendChild(wrap);
+      chatEl.appendChild(row);
+      scrollToBottom();
     }
 
-    var emailPayload = {
-      toEmail: state.demoEmail,
-      subject: "New Implant Lead ✅ (" + CLINIC.name + ")",
-      clinic: CLINIC.name,
-      name: state.name,
-      phone: state.phone,
-      email: state.email || "",
-      interest: state.interest,
-      missingDuration: state.missingDuration,
-      pain: state.pain,
-      timeline: state.timeline,
-      prefTime: state.prefTime,
-      sheetLink: "https://docs.google.com/spreadsheets/d/1kmJopC-rBArl3ZfStn4HnmtegxVTdoEFbz7wkqtXf30/edit?resourcekey=&gid=187721049#gid=187721049",
-formLink: FORM_LINK
-    };
+    function normalizePhone(p){
+      // Keep digits and + only
+      return (p || "").replace(/[^\d+]/g, "");
+    }
 
-    fetch(MAILER_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(emailPayload)
-    }).then(function () {
-      addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
-      done();
-    }).catch(function () {
-      // Even if email fails, we still want the demo to finish gracefully.
-      addMsg("⚠️ Email sending failed (demo). Please check your mailer deployment.", "bot");
-      done();
-    });
-  }
+    function isValidEmail(e){
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((e || "").trim());
+    }
 
-  // ----------------- FINISH + SUBMIT -----------------
-  function finish() {
-    addMsg("Perfect ✅ Thanks! Please review your details and submit your request.");
+    // Chat steps
+    let step = "welcome"; // welcome -> service -> name -> phone -> emailOpt -> prefTime -> notes -> confirm
+          function startBot(){
+      chatEl.innerHTML = "";
+      step = "service";
 
-    var summary =
-      "Consultation request summary:\n" +
-      "• Interest: " + (state.interest || "") + "\n" +
-      "• Missing for: " + (state.missingDuration || "") + "\n" +
-      "• Pain/swelling: " + (state.pain || "") + "\n" +
-      "• Timeline: " + (state.timeline || "") + "\n" +
-      "• Preferred time: " + (state.prefTime || "") + "\n" +
-      "• Name: " + (state.name || "") + "\n" +
-      "• Phone: " + (state.phone || "") + "\n" +
-      "• Email: " + (state.email || "—");
+      addMsg("Hi 👋 I’m Patient Concierge AI. I’ll help you request an appointment.", "bot");
+      addMsg("What do you need help with today?", "bot");
 
-    addMsg(summary, "bot");
+      addChoices("Choose one:", SERVICES, {
+        className: "primary",
+        onPick: (service) => {
+          state.service = service;
+          addMsg(service, "you");
+          askName();
+        }
+      });
+    }
 
-    setButtons([
-      { label: "Submit Request", value: "submit", className: "success" },
-      { label: "Open Form (Backup)", value: "open", className: "secondary" }
-    ], function (v) {
-      if (v === "open") {
-        window.open(FORM_LINK, "_blank");
-        return;
-      }
+    function askName(){
+      step = "name";
+      addMsg("Great ✅ What’s your full name?", "bot");
+    }
 
-      addMsg("Submitting… ✅", "bot");
+    function askPhone(){
+      step = "phone";
+      addMsg("Thanks. What’s your phone number? (so the clinic can contact you)", "bot");
+    }
 
-      submitToGoogleForm(function () {
-        sendDemoEmailIfNeeded(function () {
-          controls.innerHTML = "";
-          var box = document.createElement("div");
-          box.className = "successBox";
-          box.innerHTML =
-            "<b>✅ Request received.</b><br/>" +
-            "Thank you. The clinic team will contact you shortly to confirm your consultation." +
-            "<br/><br/>If this is a demo, check your inbox/spam for the lead summary email.";
-          controls.appendChild(box);
+    function askEmailOptional(){
+      step = "emailOpt";
+      addMsg("Email (optional): you can type it now or type 'skip'.", "bot");
+    }
+
+    function askPreferredTime(){
+      step = "prefTime";
+      addChoices("When should the clinic contact you?", [
+        "Morning",
+        "Afternoon",
+        "Evening",
+        "Anytime today"
+      ], {
+        className: "green",
+        onPick: (t) => {
+          state.preferredTime = t;
+          addMsg(t, "you");
+          askNotes();
+        }
+      });
+    }
+
+    function askNotes(){
+      step = "notes";
+      addMsg("Final question: briefly describe what you need (1 sentence is fine).", "bot");
+    }
+
+    function confirmAndSend(){
+      step = "confirm";
+
+      addMsg("Perfect ✅ Here’s what we’ll send to the clinic:", "bot");
+      addMsg(
+        "Service: " + state.service +
+        "\nName: " + state.name +
+        "\nPhone: " + state.phone +
+        (state.email ? "\nEmail: " + state.email : "\nEmail: (not provided)") +
+        "\nPreferred time: " + state.preferredTime +
+        "\nNotes: " + state.notes,
+        "bot"
+      );
+
+      addChoices("Send now?", ["Send request ✅", "Edit details"], {
+        className: "primary",
+        onPick: async (pick) => {
+          addMsg(pick, "you");
+          if (pick.includes("Send")) {
+            await sendLead();
+          } else {
+            addMsg("No problem. Let’s restart the questions.", "bot");
+            state.service = "";
+            state.name = "";
+            state.phone = "";
+            state.email = "";
+            state.preferredTime = "";
+            state.notes = "";
+            startBot();
+          }
+        }
+      });
+    }
+
+    async function sendLead(){
+      // payload to Google Apps Script
+      const payload = {
+        demoEmail: state.clinicEmail || "",
+        mode: DEMO_MODE ? "DEMO" : "LIVE",
+        service: state.service,
+        patientName: state.name,
+        patientPhone: state.phone,
+        patientEmail: state.email,
+        preferredTime: state.preferredTime,
+        notes: state.notes,
+        submittedAt: new Date().toISOString()
+      };
+
+      try{
+        addMsg("Sending your request now…", "bot");
+
+        await fetch(MAILER_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
         });
-      }, function () {
-        addMsg("⚠️ Something went wrong submitting. Please use 'Open Form (Backup)'.", "bot");
-      });
+
+        addMsg("✅ Done! Your request has been sent to the clinic.", "bot");
+
+        if (DEMO_MODE && state.clinicEmail){
+          addMsg("✅ Demo email sent to: " + state.clinicEmail, "bot");
+        }
+
+        addMsg("If you have another request, refresh the page to start again.", "bot");
+      } catch (e){
+        addMsg("⚠️ Something went wrong sending the request. Please try again.", "bot");
+        console.error(e);
+      }
+    }
+
+    // Input handling
+    function handleUserText(text){
+      const t = (text || "").trim();
+
+      if (!t) return;
+
+      addMsg(t, "you");
+
+      if (step === "name"){
+        state.name = t;
+        askPhone();
+        return;
+      }
+
+      if (step === "phone"){
+        state.phone = normalizePhone(t);
+        askEmailOptional();
+        return;
+      }
+
+      if (step === "emailOpt"){
+        if (t.toLowerCase() === "skip"){
+          state.email = "";
+          askPreferredTime();
+          return;
+        }
+        if (!isValidEmail(t)){
+          addMsg("That email doesn’t look correct. Please type a valid email or type 'skip'.", "bot");
+          return;
+        }
+        state.email = t;
+        askPreferredTime();
+        return;
+      }
+
+      if (step === "notes"){
+        state.notes = t;
+        confirmAndSend();
+        return;
+      }
+
+      // Default fallback
+      addMsg("Please use the buttons above, or refresh to restart.", "bot");
+    }
+          // Events
+    sendBtn.addEventListener("click", () => {
+      handleUserText(textInput.value);
+      textInput.value = "";
+      textInput.focus();
     });
-  }
 
-  // ----------------- START -----------------
-  if (DEMO_MODE) demoAskEmail();
-  else startPatientFlow();
+    textInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter"){
+        handleUserText(textInput.value);
+        textInput.value = "";
+      }
+    });
 
-})(); // end IIFE
-</script>
+    demoStartBtn.addEventListener("click", () => {
+      const email = (demoEmailEl.value || "").trim();
 
+      if (!isValidEmail(email)){
+        noticeBox.innerHTML = "⚠️ Please enter a valid clinic email for demo mode.";
+        return;
+      }
+
+      DEMO_MODE = true;
+      state.clinicEmail = email;
+
+      noticeBox.innerHTML = "<span class='ok'>✅ Demo active:</span> leads will be emailed to <b>" + email + "</b>";
+      startBot();
+      textInput.focus();
+    });
+
+    // Auto-start normal chat if user isn't using demo
+    // (They can still click Start demo anytime)
+    addMsg("Welcome 👋 To demo, enter your clinic email on the right and press 'Start demo'.", "bot");
+    addMsg("Or you can continue normally and the clinic will receive your request.", "bot");
+    addMsg("Click 'Start demo' to begin.", "bot");
+
+  </script>
 </body>
 </html>
