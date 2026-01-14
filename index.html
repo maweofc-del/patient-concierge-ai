@@ -470,24 +470,37 @@
   }
 
   // ----------------- SUBMISSIONS -----------------
-  async function submitToGoogleForm() {
-    const payload = new URLSearchParams();
-    payload.append(ENTRY.name, state.name || "");
-    payload.append(ENTRY.phone, state.phone || "");
-    payload.append(ENTRY.email, state.email || "");
-    payload.append(ENTRY.interest, state.interest || "");
-    payload.append(ENTRY.missingDuration, state.missingDuration || "");
-    payload.append(ENTRY.pain, state.pain || "");
-    payload.append(ENTRY.timeline, state.timeline || "");
-    payload.append(ENTRY.prefTime, state.prefTime || "");
-    payload.append(ENTRY.notes, "Submitted via Patient Concierge AI");
+  async function sendDemoEmailIfNeeded() {
+  if (!DEMO_MODE || !state.demoEmail) return;
 
-    await fetch(FORM_RESPONSE_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: payload.toString()
-    });
+  const payload = {
+    toEmail: state.demoEmail,
+    subject: `New Implant Lead ✅ (${CLINIC.name})`,
+    clinic: CLINIC.name,
+    name: state.name,
+    phone: state.phone,
+    email: state.email || "",
+    interest: state.interest,
+    missingDuration: state.missingDuration,
+    pain: state.pain,
+    timeline: state.timeline,
+    prefTime: state.prefTime,
+    formLink: (typeof FORM_LINK !== "undefined" ? FORM_LINK : ""),
+  };
+
+  // 🔥 This is the important part: App Script reads postData.contents.
+  // Using text/plain avoids CORS preflight.
+  await fetch(MAILER_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+
+  // Debug proof in console
+  console.log("Demo mailer called for:", state.demoEmail);
+    addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
+}
   }
 
   async function sendDemoEmailIfNeeded() {
