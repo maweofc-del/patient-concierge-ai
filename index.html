@@ -38,8 +38,24 @@
   </div>
 
 <script>
-  // Your Google Form LIVE link (this opens at the end)
+  // Your Google Form LIVE link (backup)
   const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/viewform";
+
+  // Google Forms submission endpoint (this is what auto-submits in the background)
+  const FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/formResponse";
+
+  // Your entry IDs (from your pre-filled link)
+  const ENTRY = {
+    name: "entry.98128128",
+    phone: "entry.1541422852",
+    email: "entry.1254364814",
+    interest: "entry.1614899485",
+    missingDuration: "entry.458020986",
+    pain: "entry.389541324",
+    timeline: "entry.539871036",
+    prefTime: "entry.156682484",
+    notes: "entry.1367604722"
+  };
 
   const chat = document.getElementById("chat");
   const controls = document.getElementById("controls");
@@ -200,9 +216,31 @@
     });
   }
 
+  async function submitToGoogleForm() {
+    const payload = new URLSearchParams();
+
+    payload.append(ENTRY.name, state.name || "");
+    payload.append(ENTRY.phone, state.phone || "");
+    payload.append(ENTRY.email, state.email || "");
+    payload.append(ENTRY.interest, state.interest || "");
+    payload.append(ENTRY.missingDuration, state.missingDuration || "");
+    payload.append(ENTRY.pain, state.pain || "");
+    payload.append(ENTRY.timeline, state.timeline || "");
+    payload.append(ENTRY.prefTime, state.prefTime || "");
+    payload.append(ENTRY.notes, "Submitted via Patient Concierge AI");
+
+    // no-cors is required from GitHub Pages (browser security)
+    await fetch(FORM_RESPONSE_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload.toString()
+    });
+  }
+
   function finish() {
     addMsg("Perfect ✅ Thanks! Your request is ready to submit.");
-    addMsg("Tap the button below to send it to the clinic.");
+    addMsg("Tap Submit and we’ll send it to the clinic now.");
 
     const summary =
 `Implant request summary:
@@ -218,11 +256,23 @@
     addMsg(summary, "bot");
 
     setButtons([
-      { label: "Submit Request", value: "go", className: "done" },
-      { label: "Open Clinic Form", value: "open", className: "secondary" }
-    ], (v) => {
-      if (v === "go" || v === "open") {
+      { label: "Submit Request", value: "submit", className: "done" },
+      { label: "Open Form (Backup)", value: "open", className: "secondary" }
+    ], async (v) => {
+
+      if (v === "open") {
         window.open(FORM_LINK, "_blank");
+        return;
+      }
+
+      addMsg("Submitting… ✅", "bot");
+
+      try {
+        await submitToGoogleForm();
+        addMsg("✅ Thank you! Your request has been received. Our team will contact you shortly to confirm your consultation.", "bot");
+        controls.innerHTML = "";
+      } catch (err) {
+        addMsg("⚠️ Something went wrong. Please tap 'Open Form (Backup)' to submit.", "bot");
       }
     });
   }
