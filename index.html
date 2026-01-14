@@ -5,67 +5,61 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Patient Concierge AI — Dental Booking Chatbot</title>
   <meta name="description" content="A 24/7 dental booking chatbot that captures patient requests and sends your clinic the full details instantly by email + Google Sheets." />
-
   <style>
     :root{
-      --bg:#070b14;
-      --card:#0f172a;
-      --card2:#111c33;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --brand:#38bdf8;
-      --brand2:#22c55e;
-      --border:rgba(148,163,184,.18);
-      --shadow:0 22px 70px rgba(0,0,0,.42);
+      --bg:#f7fbff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#475569;
+      --brand:#2563eb;
+      --brand2:#0ea5e9;
+      --green:#16a34a;
+      --border:rgba(15,23,42,.10);
+      --shadow:0 18px 55px rgba(2,6,23,.10);
       --radius:22px;
-      --soft:rgba(255,255,255,.04);
-      --soft2:rgba(255,255,255,.06);
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background:
-        radial-gradient(1100px 700px at 25% 10%, rgba(56,189,248,.16), transparent 60%),
-        radial-gradient(1100px 700px at 80% 10%, rgba(34,197,94,.12), transparent 60%),
-        linear-gradient(180deg,#050710,#070b14);
       color:var(--text);
+      background:
+        radial-gradient(900px 600px at 20% 0%, rgba(14,165,233,.10), transparent 60%),
+        radial-gradient(900px 600px at 80% 0%, rgba(22,163,74,.10), transparent 60%),
+        linear-gradient(180deg,#ffffff,var(--bg));
       min-height:100vh;
     }
     a{color:inherit}
-    .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 72px}
-
-    /* Top nav */
+    .wrap{max-width:1180px;margin:0 auto;padding:28px 18px 70px}
     .nav{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:10px 0 22px;
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding:12px 0 22px;
     }
     .brand{
       display:flex;align-items:center;gap:12px;text-decoration:none;
-      font-weight:950;
     }
     .logo{
-      width:44px;height:44px;border-radius:16px;
+      width:46px;height:46px;border-radius:16px;
+      background:linear-gradient(135deg,var(--brand),var(--brand2));
       display:grid;place-items:center;
-      background:linear-gradient(135deg,#2563eb,#38bdf8);
-      color:#fff;font-weight:1000;letter-spacing:.4px;
-      box-shadow:0 14px 40px rgba(56,189,248,.18);
+      color:#fff;font-weight:900;letter-spacing:.4px;
+      box-shadow:0 14px 35px rgba(37,99,235,.20);
     }
     .brandMeta{line-height:1.05}
-    .brandMeta small{display:block;color:var(--muted);font-weight:700;font-size:12px;margin-top:3px}
+    .brandMeta b{font-size:15px}
+    .brandMeta small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
     .pill{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 12px;border-radius:999px;
       border:1px solid var(--border);
-      background:rgba(15,23,42,.35);
+      background:rgba(255,255,255,.70);
       color:var(--muted);font-size:13px;font-weight:700;
       white-space:nowrap;
     }
 
-    /* Hero */
     .hero{
       display:grid;
-      grid-template-columns: 1.25fr .75fr;
+      grid-template-columns: 1.2fr .8fr;
       gap:18px;
       align-items:stretch;
       margin-top:8px;
@@ -73,17 +67,16 @@
     @media (max-width:980px){ .hero{grid-template-columns:1fr} }
 
     .card{
-      background:linear-gradient(180deg,var(--card),var(--card2));
+      background:var(--card);
       border:1px solid var(--border);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      overflow:hidden;
     }
     .heroLeft{padding:30px}
     h1{
       margin:0 0 12px;
       font-size:44px;
-      line-height:1.05;
+      line-height:1.06;
       letter-spacing:-0.02em;
     }
     @media (max-width:520px){ h1{font-size:34px} }
@@ -99,39 +92,35 @@
     .btn{
       appearance:none;border:0;cursor:pointer;text-decoration:none;
       display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      padding:12px 14px;border-radius:14px;font-weight:950;
+      padding:12px 14px;border-radius:14px;font-weight:900;
       transition: transform .08s ease, filter .2s ease, background .2s ease;
       user-select:none;
     }
-    .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
-    .btnPrimary{background:linear-gradient(135deg,#2563eb,#38bdf8); color:#fff}
-    .btnGhost{background:rgba(255,255,255,.06); border:1px solid var(--border); color:var(--text)}
+    .btn:hover{transform:translateY(-1px);filter:brightness(1.02)}
+    .btnPrimary{background:linear-gradient(135deg,var(--brand),var(--brand2)); color:#fff}
+    .btnGhost{background:#fff;border:1px solid var(--border); color:var(--text)}
     .btnGreen{background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff}
 
-    .miniRow{
-      display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;
-      color:var(--muted);font-size:13px
-    }
+    .tagRow{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
     .tag{
       border:1px solid var(--border);
-      background:rgba(255,255,255,.04);
+      background:rgba(255,255,255,.7);
       padding:8px 10px;border-radius:999px;
       font-weight:800;
+      font-size:13px;
+      color:var(--muted);
     }
 
-    /* Features grid */
     .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:18px}
     @media (max-width:980px){ .grid3{grid-template-columns:1fr} }
-    .miniCard{padding:16px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:18px}
-    .miniCard h3{margin:0 0 6px;font-size:14px;letter-spacing:.2px}
+    .miniCard{padding:16px;border:1px solid var(--border);border-radius:18px;background:#fff}
+    .miniCard h3{margin:0 0 6px;font-size:14px}
     .miniCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
 
-    /* Right hero preview */
     .heroRight{padding:18px;display:flex;flex-direction:column;gap:12px}
     .preview{
-      border-radius:18px;
-      border:1px solid var(--border);
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border-radius:18px;border:1px solid var(--border);
+      background:linear-gradient(180deg,#ffffff,#f4fbff);
       overflow:hidden;
     }
     .previewTop{
@@ -139,93 +128,36 @@
       padding:12px 12px;border-bottom:1px solid var(--border);
     }
     .dots{display:flex;gap:6px}
-    .dot{width:10px;height:10px;border-radius:999px;background:rgba(148,163,184,.35)}
-    .online{font-size:12px;color:#86efac;font-weight:950}
+    .dot{width:10px;height:10px;border-radius:999px;background:rgba(15,23,42,.14)}
+    .online{font-size:12px;color:var(--green);font-weight:900}
     .shot{padding:12px}
-    .bubble{max-width:92%; padding:10px 12px;border-radius:14px;margin:8px 0;font-size:13px;line-height:1.35;border:1px solid var(--border)}
-    .bBot{background:rgba(56,189,248,.10)}
-    .bYou{background:rgba(34,197,94,.10); margin-left:auto}
-
-    /* Sections */
-    .section{margin-top:18px}
-    .sectionTitle{
-      margin:0 0 10px;
-      font-size:16px;
-      font-weight:950;
-      letter-spacing:.2px;
+    .bubble{
+      max-width:92%; padding:10px 12px;border-radius:14px;margin:8px 0;
+      font-size:13px;line-height:1.35;border:1px solid var(--border)
     }
-    .sectionSub{margin:0 0 14px;color:var(--muted);font-size:13px;line-height:1.6}
-        .twoCol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media (max-width:980px){ .twoCol{grid-template-columns:1fr} }
-
-    .box{padding:18px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:18px}
-    .price{
-      display:flex;align-items:baseline;gap:10px;margin:10px 0 6px
-    }
-    .price strong{font-size:40px;letter-spacing:-0.02em}
-    .price span{color:var(--muted);font-size:13px;font-weight:800}
-    .list{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.75}
-    .list li{margin:4px 0}
-
-    .steps{display:grid;gap:10px}
-    .step{display:flex;gap:12px;align-items:flex-start}
-    .num{
-      width:28px;height:28px;border-radius:10px;
-      background:rgba(56,189,248,.12);
-      border:1px solid rgba(56,189,248,.28);
-      display:grid;place-items:center;
-      color:var(--brand);font-weight:1000;flex:0 0 auto;
-    }
-    .step b{display:block}
-    .step small{display:block;color:var(--muted);font-size:13px;line-height:1.45;margin-top:2px}
-
-    /* FAQ */
-    details{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:12px 14px;
-      margin:10px 0;
-    }
-    summary{cursor:pointer;font-weight:950}
-    details p{color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px}
-
-    /* Footer */
-    .foot{
-      margin-top:22px;
-      padding:14px 16px;
-      color:var(--muted);
-      font-size:12px;
-      text-align:center;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.02);
-      border-radius:16px;
-    }
-
-    .muted{color:var(--muted)}
+    .bBot{background:rgba(37,99,235,.08)}
+    .bYou{background:rgba(22,163,74,.10); margin-left:auto}
   </style>
 </head>
-
 <body>
   <div class="wrap">
     <div class="nav">
       <a class="brand" href="./">
         <div class="logo">PC</div>
         <div class="brandMeta">
-          Patient Concierge AI
+          <b>Patient Concierge AI</b>
           <small>24/7 Dental Booking Chatbot</small>
         </div>
       </a>
-
       <div class="pill">✅ Live demo • Setup in minutes</div>
     </div>
 
     <div class="hero">
       <div class="card heroLeft">
-        <h1>Turn dental enquiries into booked appointments — automatically.</h1>
+        <h1>A cleaner way to capture dental bookings — 24/7.</h1>
         <p class="sub">
-          Patient Concierge AI is a simple 24/7 “virtual receptionist” for your clinic.
-          Patients answer a quick chat (services + contact details), then your clinic receives a clean email summary and a private Google Sheets dashboard.
+          Patient Concierge AI is a virtual receptionist for your clinic.
+          Patients answer a quick chat, and you instantly receive a clean lead email plus a private Google Sheets dashboard.
         </p>
 
         <div class="ctaRow">
@@ -234,25 +166,25 @@
           <a id="whatsBtn" class="btn btnGreen" href="#" target="_blank" rel="noreferrer">WhatsApp us</a>
         </div>
 
-        <div class="miniRow">
+        <div class="tagRow">
           <div class="tag">Works after-hours</div>
           <div class="tag">Email + Google Sheets</div>
-          <div class="tag">Kenya-ready pricing</div>
-          <div class="tag">No new software</div>
+          <div class="tag">All dental services</div>
+          <div class="tag">No software installs</div>
         </div>
 
         <div class="grid3">
           <div class="miniCard">
-            <h3>Instant lead summary</h3>
-            <p>Every request arrives as a clear email with the patient’s service, phone number, preferred time, and notes.</p>
+            <h3>Instant lead email</h3>
+            <p>Service requested, patient details, preferred time, and notes — in clear text for quick follow-up.</p>
           </div>
           <div class="miniCard">
-            <h3>Professional lead dashboard</h3>
-            <p>A clean Google Sheet (Dashboard + Leads) so your team can track and follow-up easily.</p>
+            <h3>Private clinic dashboard</h3>
+            <p>Professional Google Sheet (Dashboard + Leads) to track status: New → Contacted → Booked.</p>
           </div>
           <div class="miniCard">
-            <h3>Covers all services</h3>
-            <p>Checkups, pain/emergency, braces, whitening, extractions, fillings, implants, kids dentistry, and more.</p>
+            <h3>Boost conversions</h3>
+            <p>Capture enquiries from Instagram, WhatsApp, Google, or your website — even when reception is busy.</p>
           </div>
         </div>
       </div>
@@ -261,199 +193,180 @@
         <div class="preview">
           <div class="previewTop">
             <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-            <div style="font-weight:950;font-size:13px">Patient Concierge AI</div>
+            <div style="font-weight:900;font-size:13px">Patient Concierge AI</div>
             <div class="online">● Online</div>
           </div>
           <div class="shot">
             <div class="bubble bBot">Hi 👋 What do you need help with today?</div>
-            <div class="bubble bYou">Tooth pain / emergency</div>
-            <div class="bubble bBot">Thanks. What’s your full name?</div>
-            <div class="bubble bYou">Amina W.</div>
-            <div class="bubble bBot">Perfect — we’ll send your request to the clinic now ✅</div>
+            <div class="bubble bYou">Checkup / cleaning</div>
+            <div class="bubble bBot">What’s your full name?</div>
+            <div class="bubble bYou">Brian K.</div>
+            <div class="bubble bBot">Perfect — we’ll send your request to the clinic ✅</div>
           </div>
         </div>
 
-        <div class="box">
-          <div style="font-weight:950;margin-bottom:6px">What clinics receive</div>
-          <div class="muted" style="font-size:13px;line-height:1.6">
-            ✅ Email summary (service + patient details)<br/>
-            ✅ Private Google Sheets dashboard<br/>
-            ✅ Easy follow-up workflow (Status column)
-          </div>
+        <div class="miniCard">
+          <h3 style="margin:0 0 6px">Clinics receive</h3>
+          <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.55">
+            ✅ Email summary instantly<br/>
+            ✅ Leads saved in Sheets<br/>
+            ✅ Clean workflow for follow-up
+          </p>
         </div>
       </div>
     </div>
-        <div class="section">
-      <div class="card" style="padding:22px">
-        <div class="sectionTitle">Pricing (Kenya)</div>
-        <div class="sectionSub">Simple monthly subscription per clinic. Cancel anytime.</div>
+        <div style="margin-top:18px" class="card heroLeft">
+      <div style="padding:22px">
+        <div style="font-weight:950;font-size:16px;margin-bottom:6px">Pricing (Kenya)</div>
+        <div style="color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px">
+          Simple monthly subscription per clinic. Cancel anytime.
+        </div>
 
-        <div class="twoCol">
-          <div class="box">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="miniCard" style="padding:18px">
             <div style="font-weight:950">Patient Concierge AI</div>
-            <div class="price">
-              <strong>KSh 15,000</strong>
-              <span>/ month</span>
+            <div style="display:flex;align-items:baseline;gap:10px;margin:10px 0 6px">
+              <div style="font-size:40px;font-weight:950;letter-spacing:-0.02em">KSh 15,000</div>
+              <div style="color:var(--muted);font-size:13px;font-weight:800">/ month</div>
             </div>
-            <div class="muted" style="font-size:13px;line-height:1.6">
-              Includes setup support, clinic email notifications, and your private Sheets dashboard.
+            <div style="color:var(--muted);font-size:13px;line-height:1.6">
+              Includes setup support, email notifications, and a private dashboard.
             </div>
-            <ul class="list">
+            <ul style="margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.75">
               <li>Unlimited patient enquiries</li>
-              <li>Service selection + contact capture</li>
-              <li>Email summaries + Sheets logging</li>
+              <li>All dental services supported</li>
+              <li>Email + Sheets logging</li>
               <li>Dashboard + Leads tab</li>
               <li>WhatsApp support</li>
             </ul>
-
-            <div class="ctaRow" style="margin-top:14px">
-              <a class="btn btnPrimary" href="./chat.html?demo=1">Try demo now</a>
-              <a class="btn btnGhost" href="#faq">View FAQ</a>
-            </div>
           </div>
 
-          <div class="box">
+          <div class="miniCard" style="padding:18px">
             <div style="font-weight:950">Setup (we do it with you)</div>
-            <div class="steps" style="margin-top:10px">
-              <div class="step">
-                <div class="num">1</div>
+            <div style="display:grid;gap:10px;margin-top:10px">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:10px;background:rgba(37,99,235,.10);border:1px solid rgba(37,99,235,.20);display:grid;place-items:center;font-weight:950;color:var(--brand)">1</div>
                 <div>
                   <b>Clinic details</b>
-                  <small>Clinic name, services list, email recipients, WhatsApp number (optional).</small>
+                  <div style="color:var(--muted);font-size:13px;line-height:1.45;margin-top:2px">
+                    Clinic name, services list, and lead recipient emails.
+                  </div>
                 </div>
               </div>
-              <div class="step">
-                <div class="num">2</div>
+
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:10px;background:rgba(37,99,235,.10);border:1px solid rgba(37,99,235,.20);display:grid;place-items:center;font-weight:950;color:var(--brand)">2</div>
                 <div>
-                  <b>Connect dashboard</b>
-                  <small>We create and format your private Google Sheet (Dashboard + Leads).</small>
+                  <b>Dashboard connection</b>
+                  <div style="color:var(--muted);font-size:13px;line-height:1.45;margin-top:2px">
+                    We create your private Google Sheet and test everything.
+                  </div>
                 </div>
               </div>
-              <div class="step">
-                <div class="num">3</div>
+
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div style="width:28px;height:28px;border-radius:10px;background:rgba(37,99,235,.10);border:1px solid rgba(37,99,235,.20);display:grid;place-items:center;font-weight:950;color:var(--brand)">3</div>
                 <div>
                   <b>Go live</b>
-                  <small>You get a shareable link (or embed code for your website later).</small>
+                  <div style="color:var(--muted);font-size:13px;line-height:1.45;margin-top:2px">
+                    Share a link on your website, Instagram bio, or WhatsApp.
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="muted" style="font-size:12px;line-height:1.6;margin-top:12px">
-              No complicated software. Runs on links you can share on your website, Instagram bio, or WhatsApp.
+            <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-top:12px">
+              No complicated software. This is designed for fast clinic adoption.
             </div>
           </div>
         </div>
       </div>
     </div>
+        <div style="margin-top:18px" class="card heroLeft">
+      <div style="padding:22px">
+        <div style="font-weight:950;font-size:16px;margin-bottom:6px">FAQ</div>
+        <div style="color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px">
+          Questions clinics usually ask before subscribing.
+        </div>
 
-    <div class="section card" style="padding:22px">
-      <div class="sectionTitle">Who this is for</div>
-      <div class="sectionSub">
-        Clinics that want more bookings, faster replies, and a simple way to capture leads even after-hours.
+        <details style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:#fff;margin:10px 0">
+          <summary style="cursor:pointer;font-weight:950">Does this replace our receptionist?</summary>
+          <p style="color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px">
+            No — it supports your team. It captures enquiries instantly and sends you clean summaries so staff can follow up faster.
+          </p>
+        </details>
+
+        <details style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:#fff;margin:10px 0">
+          <summary style="cursor:pointer;font-weight:950">What services can patients book?</summary>
+          <p style="color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px">
+            Checkup/cleaning, pain/emergency, braces, whitening, extractions, fillings/root canal, implants, kids dentistry, and “Other”.
+            We can customize the list for each clinic.
+          </p>
+        </details>
+
+        <details style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:#fff;margin:10px 0">
+          <summary style="cursor:pointer;font-weight:950">Where do leads go?</summary>
+          <p style="color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px">
+            Leads go to your clinic email instantly and are saved into your private Google Sheets dashboard.
+          </p>
+        </details>
+
+        <details style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:#fff;margin:10px 0">
+          <summary style="cursor:pointer;font-weight:950">Is the dashboard shared with other clinics?</summary>
+          <p style="color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px">
+            No. Every clinic gets their own Sheet. Your patient enquiries are not shared with anyone else.
+          </p>
+        </details>
+
+        <details style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:#fff;margin:10px 0">
+          <summary style="cursor:pointer;font-weight:950">Can multiple staff receive the lead emails?</summary>
+          <p style="color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px">
+            Yes. We can send to multiple emails (reception, manager, owner).
+          </p>
+        </details>
+
+        <details style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:#fff;margin:10px 0">
+          <summary style="cursor:pointer;font-weight:950">How fast can we go live?</summary>
+          <p style="color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px">
+            Usually same-day. Once we have your details, we connect your dashboard and test one lead end-to-end.
+          </p>
+        </details>
+
+        <details style="border:1px solid var(--border);border-radius:16px;padding:12px 14px;background:#fff;margin:10px 0">
+          <summary style="cursor:pointer;font-weight:950">Can this be added to our website?</summary>
+          <p style="color:var(--muted);margin:8px 0 0;line-height:1.6;font-size:13px">
+            Yes. You can share a link immediately. Embed support can be added later (Phase 2).
+          </p>
+        </details>
       </div>
+    </div>
+        <div style="margin-top:18px" class="card heroLeft">
+      <div style="padding:22px">
+        <div style="font-weight:950;font-size:16px;margin-bottom:6px">Ready to try it?</div>
+        <div style="color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px">
+          Use the live demo to see exactly what your clinic receives.
+        </div>
 
-      <div class="grid3">
-        <div class="miniCard">
-          <h3>Busy reception</h3>
-          <p>Reduce missed enquiries. Patients can submit requests in under 60 seconds.</p>
+        <div class="ctaRow">
+          <a class="btn btnPrimary" href="./chat.html?demo=1">▶ Try the live demo</a>
+          <a class="btn btnGhost" href="./chat.html">Open chatbot</a>
+          <a id="whatsBtn2" class="btn btnGreen" href="#" target="_blank" rel="noreferrer">WhatsApp us</a>
         </div>
-        <div class="miniCard">
-          <h3>After-hours leads</h3>
-          <p>Capture bookings from evenings and weekends, then follow up the next morning.</p>
-        </div>
-        <div class="miniCard">
-          <h3>Teams that want visibility</h3>
-          <p>Track status like “New / Contacted / Booked” directly in the dashboard.</p>
+
+        <div style="color:var(--muted);font-size:12px;line-height:1.6;margin-top:12px">
+          Note: Patient Concierge AI is for consultation requests. Final suitability and pricing are confirmed by the clinic during examination.
         </div>
       </div>
     </div>
 
-    <div id="faq" class="section card" style="padding:22px">
-      <div class="sectionTitle">FAQ</div>
-      <div class="sectionSub">Questions we typically get from dental clinics.</div>
-
-      <details>
-        <summary>Does this replace our receptionist?</summary>
-        <p>No — it supports your team. Patient Concierge AI captures enquiries and sends clean lead summaries so your staff can follow up quickly.</p>
-      </details>
-
-      <details>
-        <summary>What services can we offer?</summary>
-        <p>General checkup/cleaning, pain/emergency, braces, whitening, extraction, fillings/root canal, implants, kids dentistry, and “Other”. We can adjust the list per clinic.</p>
-      </details>
-
-      <details>
-        <summary>Where do leads go?</summary>
-        <p>Leads go to your clinic email (instant summary) and to a private Google Sheets dashboard (Dashboard + Leads tab).</p>
-      </details>
-
-      <details>
-        <summary>Will we share a sheet with other clinics?</summary>
-        <p>No. Each clinic gets their own private Google Sheet. Your data is not shared with anyone else.</p>
-      </details>
-
-      <details>
-        <summary>Can multiple staff receive emails?</summary>
-        <p>Yes. We can send to multiple clinic emails (reception, manager, owner).</p>
-      </details>
-
-      <details>
-        <summary>Can we brand it with our clinic name?</summary>
-        <p>Yes. We can customize the clinic name, services list, and wording to match your clinic tone.</p>
-      </details>
-
-      <details>
-        <summary>Do patients need to install anything?</summary>
-        <p>No. Patients just open a link and chat. Works on mobile and desktop.</p>
-      </details>
-
-      <details>
-        <summary>Can we put it on our website?</summary>
-        <p>Yes. You can share a link immediately. We can also provide an embed later if you want it inside your website.</p>
-      </details>
-
-      <details>
-        <summary>How fast is setup?</summary>
-        <p>Usually same-day. Once we have your clinic email + services list, we can activate your setup and test it with you.</p>
-      </details>
-
-      <details>
-        <summary>Does it handle payments or booking calendars?</summary>
-        <p>Right now it captures enquiries and requests. If you want calendar booking and reminders, we can upgrade later (Phase 2).</p>
-      </details>
-
-      <details>
-        <summary>Is patient data secure?</summary>
-        <p>Leads go directly to your clinic email and your private Google Sheet. You control who has access to your sheet.</p>
-      </details>
-    </div>
-        <div class="section card" style="padding:22px">
-      <div class="sectionTitle">Ready to try it?</div>
-      <div class="sectionSub">
-        Use the live demo to see exactly what your clinic will receive.
-      </div>
-
-      <div class="ctaRow">
-        <a class="btn btnPrimary" href="./chat.html?demo=1">▶ Try the live demo</a>
-        <a class="btn btnGhost" href="./chat.html">Open chatbot</a>
-        <a id="whatsBtn2" class="btn btnGreen" href="#" target="_blank" rel="noreferrer">WhatsApp us</a>
-      </div>
-
-      <div class="muted" style="font-size:12px;margin-top:12px">
-        Note: Patient Concierge AI is for consultation requests. Final suitability and pricing are confirmed by the clinic during examination.
-      </div>
-    </div>
-
-    <div class="foot">
-      Patient Concierge AI • Built for dental clinics in Kenya • Simple monthly pricing • WhatsApp support
+    <div style="margin-top:18px;color:var(--muted);font-size:12px;text-align:center">
+      Patient Concierge AI • Built for dental clinics in Kenya • Monthly subscription • WhatsApp support
     </div>
   </div>
 
   <script>
-    // ✅ Your WhatsApp number (international format, no +, no spaces)
     const WHATSAPP_NUMBER = "254116745161";
     const WHATSAPP_MESSAGE = "Hi Patient Concierge AI — I’d like to try a clinic setup demo.";
-
     const waUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(WHATSAPP_MESSAGE);
 
     const b1 = document.getElementById("whatsBtn");
