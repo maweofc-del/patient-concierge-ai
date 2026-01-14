@@ -10,12 +10,14 @@
       --bg1:#eef4ff; --bg2:#e9fff7;
       --card:#ffffff; --text:#0f172a; --muted:#475569;
       --brand:#2563eb; --brand2:#0ea5e9; --ok:#16a34a;
-      --border:rgba(15,23,42,.12); --shadow:0 18px 50px rgba(2,6,23,.12);
-      --radius:22px;
+      --border:rgba(15,23,42,.10);
+      --shadow:0 16px 50px rgba(2,6,23,.10);
+      --radius:24px;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       color:var(--text);
       background: radial-gradient(900px 600px at 25% 10%, var(--bg2), transparent 60%),
                   radial-gradient(900px 600px at 75% 10%, var(--bg1), transparent 60%),
@@ -23,8 +25,8 @@
       min-height:100vh;
     }
     a{color:inherit}
-    .wrap{max-width:1040px;margin:0 auto;padding:28px 18px 56px}
-    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+    .wrap{max-width:1180px;margin:0 auto;padding:44px 22px 70px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
     .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
     .logo{
       width:44px;height:44px;border-radius:14px;
@@ -39,64 +41,94 @@
       border-radius:999px;background:rgba(255,255,255,.7);
       color:var(--muted); font-size:13px;
     }
-    .hero{display:grid;grid-template-columns: 1.2fr .8fr;gap:20px;align-items:stretch;margin-top:18px;}
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap:28px;
+      align-items:stretch;
+      margin-top:22px;
+    }
     @media (max-width:900px){ .hero{grid-template-columns:1fr} }
+
     .card{
-      background:rgba(255,255,255,.85);
+      background:#ffffff;
       border:1px solid var(--border);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      backdrop-filter: blur(8px);
     }
-    .heroLeft{padding:28px}
-    h1{margin:0 0 10px;font-size:42px;line-height:1.08}
+
+    .heroLeft{padding:34px}
+    h1{margin:0 0 12px;font-size:44px;line-height:1.06;letter-spacing:-0.02em}
     @media (max-width:520px){ h1{font-size:34px} }
-    .sub{margin:0 0 18px;color:var(--muted);font-size:16px;line-height:1.55}
+    .sub{margin:0 0 18px;color:var(--muted);font-size:16px;line-height:1.6;max-width:60ch}
+
     .ctaRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
     .btn{
       appearance:none;border:0;cursor:pointer;text-decoration:none;
       display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      padding:12px 16px;border-radius:14px;font-weight:700;
+      padding:12px 16px;border-radius:14px;font-weight:800;
       transition: transform .08s ease, filter .2s ease, background .2s ease;
       user-select:none;
     }
     .btn:hover{transform: translateY(-1px); filter:brightness(1.02)}
     .btnPrimary{background:linear-gradient(135deg,var(--brand),var(--brand2)); color:#fff}
-    .btnGhost{background:rgba(255,255,255,.65); border:1px solid var(--border); color:var(--text)}
+    .btnGhost{background:rgba(255,255,255,.70); border:1px solid var(--border); color:var(--text)}
     .btnWhats{background:#16a34a; color:#fff}
-    .small{font-size:12px;color:var(--muted);margin-top:10px}
-    .heroRight{padding:22px}
-    .preview{border-radius:18px; border:1px solid var(--border); background:linear-gradient(180deg,#ffffff,#f8fbff); overflow:hidden;}
-    .previewTop{display:flex;align-items:center;justify-content:space-between;padding:14px 14px;border-bottom:1px solid var(--border);}
-    .dots{display:flex;gap:6px}
-    .dot{width:10px;height:10px;border-radius:999px;background:rgba(15,23,42,.15)}
-    .miniTitle{font-weight:800;font-size:13px}
-    .chatShot{padding:14px}
-    .bubble{max-width:92%; padding:10px 12px;border-radius:14px;margin:8px 0;font-size:13px;line-height:1.35}
-    .b1{background:#eef2ff;border:1px solid rgba(37,99,235,.18)}
-    .b2{background:#ecfeff;border:1px solid rgba(14,165,233,.18); margin-left:auto}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+
+    .small{font-size:12px;color:var(--muted);margin-top:12px}
+
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
     @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+
     .mini{padding:18px}
     .mini h3{margin:0 0 6px;font-size:15px}
-    .mini p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
-    .section{margin-top:18px}
+    .mini p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+
+    .heroRight{padding:22px;display:flex;flex-direction:column;gap:14px}
+    .preview{
+      border-radius:18px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg,#ffffff,#f8fbff);
+      overflow:hidden;
+    }
+    .previewTop{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 14px;border-bottom:1px solid var(--border);
+    }
+    .dots{display:flex;gap:6px}
+    .dot{width:10px;height:10px;border-radius:999px;background:rgba(15,23,42,.14)}
+    .miniTitle{font-weight:900;font-size:13px}
+    .chatShot{padding:14px}
+    .bubble{max-width:92%; padding:10px 12px;border-radius:14px;margin:8px 0;font-size:13px;line-height:1.35}
+    .b1{background:#eef2ff;border:1px solid rgba(37,99,235,.16)}
+    .b2{background:#ecfeff;border:1px solid rgba(14,165,233,.16); margin-left:auto}
+
     .split{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     @media (max-width:900px){ .split{grid-template-columns:1fr} }
+
     .pricing{padding:22px}
     .price{display:flex;align-items:baseline;gap:10px;margin:10px 0 4px}
-    .price b{font-size:38px}
+    .price b{font-size:40px}
     .price span{color:var(--muted);font-size:13px}
     ul{margin:12px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.7}
+
     .how{padding:22px}
     .step{display:flex;gap:12px;align-items:flex-start;margin:10px 0}
     .num{
       width:26px;height:26px;border-radius:10px;
-      background:rgba(37,99,235,.12); border:1px solid rgba(37,99,235,.22);
-      display:grid;place-items:center;font-weight:800;color:var(--brand);
+      background:rgba(37,99,235,.10); border:1px solid rgba(37,99,235,.18);
+      display:grid;place-items:center;font-weight:900;color:var(--brand);
       flex:0 0 auto;
     }
-    .foot{margin-top:18px;padding:14px 18px;color:var(--muted);font-size:12px;text-align:center}
+
+    .foot{
+      margin-top:22px;
+      padding:14px 18px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:center;
+    }
   </style>
 </head>
 <body>
@@ -117,18 +149,17 @@
         <h1>Turn implant inquiries into booked consultations — automatically.</h1>
         <p class="sub">
           Patient Concierge AI runs on your website and takes a 60-second implant intake like a real assistant.
-          When a patient finishes, you receive a clean email summary and a private Google Sheets lead dashboard.
+          When a patient finishes, we email you a clean lead summary and save it to your private Google Sheets dashboard.
         </p>
 
         <div class="ctaRow">
           <a class="btn btnPrimary" href="./chat.html?demo=1">▶ Try the live demo</a>
           <a class="btn btnGhost" href="./chat.html">Open chatbot</a>
-          <a class="btn btnWhats" href="https://wa.me/254000000000?text=Hi%20Patient%20Concierge%20AI%20—%20I%27d%20like%20to%20try%20a%20clinic%20setup%20demo." target="_blank" rel="noreferrer">WhatsApp us</a>
+          <a id="whatsBtn" class="btn btnWhats" href="#" target="_blank" rel="noreferrer">WhatsApp us</a>
         </div>
 
         <div class="small">
-          Tip: Use the demo link when messaging clinics:
-          <b>…/chat.html?demo=1</b>
+          Demo link for clinics: <b>…/chat.html?demo=1</b>
         </div>
 
         <div class="grid">
@@ -153,10 +184,10 @@
               <div class="dot"></div><div class="dot"></div><div class="dot"></div>
             </div>
             <div class="miniTitle">Patient Concierge AI</div>
-            <div style="font-size:12px;color:var(--ok);font-weight:800">● Online</div>
+            <div style="font-size:12px;color:var(--ok);font-weight:900">● Online</div>
           </div>
           <div class="chatShot">
-            <div class="bubble b1">Hi 👋 I’ll help you request an implant consultation.</div>
+            <div class="bubble b1">Hi 👋 We’ll help you request an implant consultation.</div>
             <div class="bubble b1">Is this for one missing tooth or more?</div>
             <div class="bubble b2">One tooth implant</div>
             <div class="bubble b1">Great — what’s your preferred time to be contacted?</div>
@@ -165,7 +196,7 @@
           </div>
         </div>
 
-        <div class="section split">
+        <div class="split">
           <div class="card pricing">
             <div style="font-weight:900">Pricing</div>
             <div class="price"><b>$99</b><span>/ month per clinic</span></div>
@@ -177,23 +208,37 @@
               <li>Support via WhatsApp</li>
             </ul>
           </div>
+
           <div class="card how">
             <div style="font-weight:900">Setup (we do it with you)</div>
-            <div class="step"><div class="num">1</div><div><b>Clinic details</b><div style="color:var(--muted);font-size:13px">Name, services, email, WhatsApp.</div></div></div>
-            <div class="step"><div class="num">2</div><div><b>Connect the dashboard</b><div style="color:var(--muted);font-size:13px">We create your private Google Sheet.</div></div></div>
-            <div class="step"><div class="num">3</div><div><b>Go live</b><div style="color:var(--muted);font-size:13px">You get a link or embed for your website.</div></div></div>
+            <div class="step">
+              <div class="num">1</div>
+              <div><b>Clinic details</b><div style="color:var(--muted);font-size:13px">Name, services, email, WhatsApp.</div></div>
+            </div>
+            <div class="step">
+              <div class="num">2</div>
+              <div><b>Connect the dashboard</b><div style="color:var(--muted);font-size:13px">We create your private Google Sheet.</div></div>
+            </div>
+            <div class="step">
+              <div class="num">3</div>
+              <div><b>Go live</b><div style="color:var(--muted);font-size:13px">You get a link or embed for your website.</div></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="foot">
+        <div class="foot">
       Patient Concierge AI • For consultation requests only. Final suitability and pricing are confirmed by the clinic during examination.
     </div>
   </div>
     <script>
-    // ✅ Replace this WhatsApp number later (format: countrycode + number, no plus signs)
-    // Example Kenya: 2547XXXXXXXX
+    const WHATSAPP_NUMBER = "254116745161";
+    const WHATSAPP_MESSAGE = "Hi — I’d like a setup demo for my clinic.";
+
+    const waUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(WHATSAPP_MESSAGE);
+
+    const btn = document.getElementById("whatsBtn");
+    if (btn) btn.href = waUrl;
   </script>
 </body>
 </html>
