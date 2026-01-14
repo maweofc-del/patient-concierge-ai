@@ -491,11 +491,13 @@
   // 🔥 This is the important part: App Script reads postData.contents.
   // Using text/plain avoids CORS preflight.
   await fetch(MAILER_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(payload)
-  });
+  method: "POST",
+  mode: "no-cors",
+  headers: { "Content-Type": "text/plain;charset=utf-8" },
+  body: JSON.stringify(payload)
+});
+
+addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
 
   // Debug proof in console
   console.log("Demo mailer called for:", state.demoEmail);
