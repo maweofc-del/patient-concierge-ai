@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Patient Concierge AI (Implants)</title>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f6f7fb; margin:0; padding:0; }
+    .wrap { max-width:720px; margin:0 auto; padding:24px; }
+    .card { background:white; border-radius:14px; padding:18px; box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    h1 { font-size:20px; margin:0 0 6px 0; }
+    p { margin:0 0 16px 0; color:#444; }
+    .chat { display:flex; flex-direction:column; gap:10px; padding:10px 0; }
+    .msg { max-width:85%; padding:12px 14px; border-radius:14px; line-height:1.25; }
+    .bot { background:#eef2ff; align-self:flex-start; }
+    .user { background:#e8fff1; align-self:flex-end; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:6px; }
+    button { border:0; padding:10px 12px; border-radius:12px; cursor:pointer; background:#111; color:white; }
+    button.secondary { background:#fff; color:#111; border:1px solid #ddd; }
+    input { width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; font-size:15px; }
+    .small { font-size:12px; color:#666; margin-top:10px; }
+    .done { background:#0b5; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Patient Concierge AI (Implants)</h1>
+      <p>Answer a few quick questions and we’ll contact you to confirm your implant consultation.</p>
+
+      <div id="chat" class="chat"></div>
+      <div id="controls"></div>
+
+      <div class="small">
+        Final suitability and exact pricing are confirmed during an in-person consultation.
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Your Google Form LIVE link (this opens at the end)
+  const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/viewform";
+
+  const chat = document.getElementById("chat");
+  const controls = document.getElementById("controls");
+
+  const state = {
+    interest: null,
+    missingDuration: null,
+    pain: null,
+    timeline: null,
+    prefTime: null,
+    name: null,
+    phone: null,
+    email: null
+  };
+
+  function addMsg(text, who="bot") {
+    const div = document.createElement("div");
+    div.className = `msg ${who}`;
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function setButtons(options, onPick) {
+    controls.innerHTML = "";
+    const wrap = document.createElement("div");
+    wrap.className = "actions";
+    options.forEach(opt => {
+      const b = document.createElement("button");
+      b.className = opt.className || "";
+      b.textContent = opt.label;
+      b.onclick = () => onPick(opt.value);
+      wrap.appendChild(b);
+    });
+    controls.appendChild(wrap);
+  }
+
+  function setInput(placeholder, onSubmit) {
+    controls.innerHTML = "";
+    const input = document.createElement("input");
+    input.placeholder = placeholder;
+    input.autocomplete = "off";
+
+    const wrap = document.createElement("div");
+    wrap.className = "actions";
+
+    const btn = document.createElement("button");
+    btn.textContent = "Send";
+
+    btn.onclick = () => {
+      const v = input.value.trim();
+      if (!v) return;
+      onSubmit(v);
+    };
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") btn.click();
+    });
+
+    wrap.appendChild(input);
+    wrap.appendChild(btn);
+    controls.appendChild(wrap);
+    input.focus();
+  }
+
+  function start() {
+    addMsg("Hi 👋 I’m the Patient Concierge. I’ll help you request an implant consultation.");
+    addMsg("Is this for one missing tooth or more?");
+
+    setButtons([
+      { label: "One tooth implant", value: "One tooth implant" },
+      { label: "Multiple teeth implants", value: "Multiple teeth implants" },
+      { label: "Full mouth implants / dentures", value: "Full mouth implants / dentures" }
+    ], (v) => {
+      state.interest = v;
+      addMsg(v, "user");
+      stepDuration();
+    });
+  }
+
+  function stepDuration() {
+    addMsg("How long have the teeth been missing?");
+    setButtons([
+      { label: "Under 3 months", value: "Under 3 months" },
+      { label: "3–12 months", value: "3–12 months" },
+      { label: "1+ years", value: "1+ years" }
+    ], (v) => {
+      state.missingDuration = v;
+      addMsg(v, "user");
+      stepPain();
+    });
+  }
+
+  function stepPain() {
+    addMsg("Are you currently experiencing pain or swelling?");
+    setButtons([
+      { label: "Yes", value: "Yes" },
+      { label: "No", value: "No" },
+      { label: "Not sure", value: "Not sure" }
+    ], (v) => {
+      state.pain = v;
+      addMsg(v, "user");
+      stepTimeline();
+    });
+  }
+
+  function stepTimeline() {
+    addMsg("When would you like your consultation?");
+    setButtons([
+      { label: "ASAP", value: "ASAP" },
+      { label: "This week", value: "This week" },
+      { label: "Next week", value: "Next week" },
+      { label: "Not sure yet", value: "Not sure yet" }
+    ], (v) => {
+      state.timeline = v;
+      addMsg(v, "user");
+      stepPrefTime();
+    });
+  }
+
+  function stepPrefTime() {
+    addMsg("Preferred appointment time?");
+    setButtons([
+      { label: "Morning", value: "Morning" },
+      { label: "Afternoon", value: "Afternoon" },
+      { label: "Evening", value: "Evening" }
+    ], (v) => {
+      state.prefTime = v;
+      addMsg(v, "user");
+      stepName();
+    });
+  }
+
+  function stepName() {
+    addMsg("Great ✅ What’s your full name?");
+    setInput("Type your name…", (v) => {
+      state.name = v;
+      addMsg(v, "user");
+      stepPhone();
+    });
+  }
+
+  function stepPhone() {
+    addMsg("What’s the best phone/WhatsApp number to confirm your consultation?");
+    setInput("Type your phone number…", (v) => {
+      state.phone = v;
+      addMsg(v, "user");
+      stepEmail();
+    });
+  }
+
+  function stepEmail() {
+    addMsg("Optional: your email (for confirmation). You can type 'skip' to continue.");
+    setInput("Type your email or 'skip'…", (v) => {
+      if (v.toLowerCase() !== "skip") state.email = v;
+      addMsg(v, "user");
+      finish();
+    });
+  }
+
+  function finish() {
+    addMsg("Perfect ✅ Thanks! Your request is ready to submit.");
+    addMsg("Tap the button below to send it to the clinic.");
+
+    const summary =
+`Implant request summary:
+• Interest: ${state.interest}
+• Missing for: ${state.missingDuration}
+• Pain/swelling: ${state.pain}
+• Timeline: ${state.timeline}
+• Preferred time: ${state.prefTime}
+• Name: ${state.name}
+• Phone: ${state.phone}
+• Email: ${state.email || "—"}`;
+
+    addMsg(summary, "bot");
+
+    setButtons([
+      { label: "Submit Request", value: "go", className: "done" },
+      { label: "Open Clinic Form", value: "open", className: "secondary" }
+    ], (v) => {
+      if (v === "go" || v === "open") {
+        window.open(FORM_LINK, "_blank");
+      }
+    });
+  }
+
+  start();
+</script>
+</body>
+</html>
