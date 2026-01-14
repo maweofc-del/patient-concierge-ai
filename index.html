@@ -16,8 +16,8 @@
       --bot:#eef2ff;
       --user:#eafff2;
 
-      --accent:#0ea5e9;   /* clinic blue */
-      --accent2:#22c55e;  /* success green */
+      --accent:#0ea5e9;
+      --accent2:#22c55e;
       --danger:#ef4444;
       --btn:#0f172a;
     }
@@ -39,7 +39,6 @@
       overflow:hidden;
     }
 
-    /* Top header */
     .top{
       padding:18px 18px 12px 18px;
       border-bottom:1px solid var(--line);
@@ -73,7 +72,7 @@
       font-size:12px;
       color:var(--muted);
       line-height:1.4;
-      max-width:520px;
+      max-width:560px;
     }
     .tag{
       margin-top:2px;
@@ -95,7 +94,6 @@
       box-shadow:0 0 0 4px rgba(34,197,94,0.15);
     }
 
-    /* Clinic card */
     .clinicCard{
       margin:14px 18px 0 18px;
       border:1px solid var(--line);
@@ -108,19 +106,9 @@
       flex-wrap:wrap;
       align-items:center;
     }
-    .clinicLeft{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    .clinicName{
-      font-weight:800;
-      font-size:13px;
-    }
-    .clinicMeta{
-      font-size:12px;
-      color:var(--muted);
-    }
+    .clinicLeft{ display:flex; flex-direction:column; gap:4px; }
+    .clinicName{ font-weight:800; font-size:13px; }
+    .clinicMeta{ font-size:12px; color:var(--muted); }
     .privacy{
       font-size:12px;
       color:var(--muted);
@@ -139,7 +127,6 @@
       font-size:12px;
     }
 
-    /* Chat */
     .main{ padding:14px 18px 18px 18px; }
     .chat{
       display:flex;
@@ -166,14 +153,9 @@
       align-self:flex-end;
       border:1px solid #c9f6da;
     }
-    .controls{
-      margin-top:6px;
-    }
-    .actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
+    .controls{ margin-top:6px; }
+    .actions{ display:flex; flex-wrap:wrap; gap:10px; }
+
     button{
       border:0;
       padding:10px 12px;
@@ -188,12 +170,9 @@
       color:var(--text);
       border:1px solid var(--line);
     }
-    button.success{
-      background:var(--accent2);
-    }
-    button.warn{
-      background:var(--danger);
-    }
+    button.success{ background:var(--accent2); }
+    button.warn{ background:var(--danger); }
+
     input{
       width:100%;
       padding:12px;
@@ -236,7 +215,7 @@
           <div class="mark">PC</div>
           <div class="titleBlock">
             <h1>Patient Concierge AI – Implant Leads</h1>
-            <p>
+            <p id="subtitle">
               A clinic-grade assistant that gathers the key implant consultation details in under 60 seconds,
               then submits them securely so the clinic can call and confirm.
             </p>
@@ -269,8 +248,13 @@
   </div>
 
 <script>
-  // ---------- OPTIONAL CLINIC BRANDING (you can change these anytime) ----------
-  // Keep the product name consistent; only change the clinic name/meta when installing for a client.
+  // ----------------- DEMO MODE -----------------
+  // Demo link:  https://maweofc-del.github.io/patient-concierge-ai/?demo=1
+  // Normal:     https://maweofc-del.github.io/patient-concierge-ai/
+  const params = new URLSearchParams(window.location.search);
+  const DEMO_MODE = params.get("demo") === "1";
+
+  // ----------------- CLINIC BRANDING -----------------
   const CLINIC = {
     name: "Demo Dental Clinic",
     meta: "Implant consultations • Nairobi",
@@ -279,7 +263,12 @@
   document.getElementById("clinicName").textContent = CLINIC.name;
   document.getElementById("clinicMeta").textContent = CLINIC.meta;
 
-  // ---------- GOOGLE FORM CONFIG (auto-submits in the background) ----------
+  if (DEMO_MODE) {
+    document.getElementById("subtitle").textContent =
+      "Demo mode: enter your email to receive the lead summary after submission, then try the chatbot like a patient.";
+  }
+
+  // ----------------- GOOGLE FORM CONFIG (auto-submits to Sheets) -----------------
   const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/viewform";
   const FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/formResponse";
 
@@ -295,11 +284,15 @@
     notes: "entry.1367604722"
   };
 
-  // ---------- UI HELPERS ----------
+  // ----------------- APPS SCRIPT MAILER (for demo proof) -----------------
+  const MAILER_URL = "https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec";
+
+  // ----------------- UI HELPERS -----------------
   const chat = document.getElementById("chat");
   const controls = document.getElementById("controls");
 
   const state = {
+    demoEmail: null, // only used in demo mode
     interest: null,
     missingDuration: null,
     pain: null,
@@ -360,8 +353,28 @@
     input.focus();
   }
 
-  // ---------- CONVERSATION FLOW ----------
-  function start() {
+  function isEmailLike(v){
+    return v.includes("@") && v.includes(".");
+  }
+
+  // ----------------- DEMO EMAIL STEP -----------------
+  function demoAskEmail() {
+    addMsg("👋 Demo mode: What email should receive the lead summary after submission?");
+    setInput("Type your email…", (v) => {
+      if (!isEmailLike(v)) {
+        addMsg("That doesn’t look like an email. Please type a valid email (example: clinic@gmail.com).");
+        demoAskEmail();
+        return;
+      }
+      state.demoEmail = v;
+      addMsg(v, "user");
+      addMsg("Great ✅ Now try the chatbot like a patient to see the full lead workflow.");
+      startPatientFlow();
+    });
+  }
+
+  // ----------------- CONVERSATION FLOW -----------------
+  function startPatientFlow() {
     addMsg("Hi 👋 I’m the clinic’s intake assistant. I’ll help you request an implant consultation.");
     addMsg("Is this for one missing tooth or more?");
 
@@ -456,6 +469,7 @@
     });
   }
 
+  // ----------------- SUBMISSIONS -----------------
   async function submitToGoogleForm() {
     const payload = new URLSearchParams();
     payload.append(ENTRY.name, state.name || "");
@@ -473,6 +487,32 @@
       mode: "no-cors",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: payload.toString()
+    });
+  }
+
+  async function sendDemoEmailIfNeeded() {
+    if (!DEMO_MODE || !state.demoEmail) return;
+
+    const payload = {
+      toEmail: state.demoEmail,
+      subject: `New Implant Lead ✅ (${CLINIC.name})`,
+      clinic: CLINIC.name,
+      name: state.name,
+      phone: state.phone,
+      email: state.email || "",
+      interest: state.interest,
+      missingDuration: state.missingDuration,
+      pain: state.pain,
+      timeline: state.timeline,
+      prefTime: state.prefTime
+    };
+
+    // IMPORTANT: Use text/plain to avoid browser preflight/CORS issues.
+    await fetch(MAILER_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
     });
   }
 
@@ -517,15 +557,26 @@
       addMsg("Submitting… ✅", "bot");
 
       try {
+        // 1) save to Sheets (Google Form)
         await submitToGoogleForm();
+
+        // 2) demo proof email to the demoer
+        await sendDemoEmailIfNeeded();
 
         controls.innerHTML = "";
         const success = document.createElement("div");
         success.className = "successBox";
+
+        const extra = (DEMO_MODE && state.demoEmail)
+          ? ("<br/><br/><b>Demo:</b> A lead summary was sent to <b>" + state.demoEmail + "</b>. Check your inbox (and Spam).")
+          : "";
+
         success.innerHTML =
           "<b>✅ Request received.</b><br/>" +
-          "Thank you. The clinic team will contact you shortly to confirm your consultation.<br/><br/>" +
-          "<span style='color:#065f46'>Tip:</span> Please keep your phone available for a call or WhatsApp message.";
+          "Thank you. The clinic team will contact you shortly to confirm your consultation." +
+          extra +
+          "<br/><br/><span style='color:#065f46'>Tip:</span> Please keep your phone available for a call or WhatsApp message.";
+
         controls.appendChild(success);
 
       } catch (err) {
@@ -534,7 +585,9 @@
     });
   }
 
-  start();
+  // ----------------- START -----------------
+  if (DEMO_MODE) demoAskEmail();
+  else startPatientFlow();
 </script>
 </body>
 </html>
