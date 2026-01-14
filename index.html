@@ -4,6 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Patient Concierge AI – Implant Leads</title>
+
   <style>
     :root{
       --bg:#f4f7fb;
@@ -38,7 +39,6 @@
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-
     .top{
       padding:18px 18px 12px 18px;
       border-bottom:1px solid var(--line);
@@ -207,6 +207,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div class="shell">
@@ -249,16 +250,15 @@
 
 <script>
   // ----------------- DEMO MODE -----------------
-  // Demo link:  https://maweofc-del.github.io/patient-concierge-ai/?demo=1
-  // Normal:     https://maweofc-del.github.io/patient-concierge-ai/
+  // Demo:    https://maweofc-del.github.io/patient-concierge-ai/?demo=1
+  // Normal:  https://maweofc-del.github.io/patient-concierge-ai/
   const params = new URLSearchParams(window.location.search);
   const DEMO_MODE = params.get("demo") === "1";
 
   // ----------------- CLINIC BRANDING -----------------
   const CLINIC = {
     name: "Demo Dental Clinic",
-    meta: "Implant consultations • Nairobi",
-    urgentWhatsApp: "" // example: "+2547XXXXXXXX". Leave empty to hide urgent button.
+    meta: "Implant consultations • Nairobi"
   };
   document.getElementById("clinicName").textContent = CLINIC.name;
   document.getElementById("clinicMeta").textContent = CLINIC.meta;
@@ -268,10 +268,11 @@
       "Demo mode: enter your email to receive the lead summary after submission, then try the chatbot like a patient.";
   }
 
-  // ----------------- GOOGLE FORM CONFIG (auto-submits to Sheets) -----------------
+  // ----------------- GOOGLE FORM CONFIG (Sheets) -----------------
   const FORM_LINK = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/viewform";
   const FORM_RESPONSE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdDmAFe3cRn7yZIKJRILYZPoP0nJyNtQ4jZFfOt64UcqKfK7w/formResponse";
 
+  // Your form field IDs
   const ENTRY = {
     name: "entry.98128128",
     phone: "entry.1541422852",
@@ -284,7 +285,7 @@
     notes: "entry.1367604722"
   };
 
-  // ----------------- APPS SCRIPT MAILER (for demo proof) -----------------
+  // ----------------- APPS SCRIPT MAILER -----------------
   const MAILER_URL = "https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec";
 
   // ----------------- UI HELPERS -----------------
@@ -292,7 +293,7 @@
   const controls = document.getElementById("controls");
 
   const state = {
-    demoEmail: null, // only used in demo mode
+    demoEmail: null,
     interest: null,
     missingDuration: null,
     pain: null,
@@ -368,12 +369,12 @@
       }
       state.demoEmail = v;
       addMsg(v, "user");
-      addMsg("Great ✅ Now try the chatbot like a patient to see the full lead workflow.");
+      addMsg("Perfect ✅ Now try the chatbot like a patient so you can see the full workflow.");
       startPatientFlow();
     });
   }
 
-  // ----------------- CONVERSATION FLOW -----------------
+  // ----------------- PATIENT FLOW -----------------
   function startPatientFlow() {
     addMsg("Hi 👋 I’m the clinic’s intake assistant. I’ll help you request an implant consultation.");
     addMsg("Is this for one missing tooth or more?");
@@ -469,42 +470,28 @@
     });
   }
 
-  // ----------------- SUBMISSIONS -----------------
-  async function sendDemoEmailIfNeeded() {
-  if (!DEMO_MODE || !state.demoEmail) return;
+  // ----------------- SUBMIT TO GOOGLE FORM (SHEETS) -----------------
+  async function submitToGoogleForm() {
+    const payload = new URLSearchParams();
+    payload.append(ENTRY.name, state.name || "");
+    payload.append(ENTRY.phone, state.phone || "");
+    payload.append(ENTRY.email, state.email || "");
+    payload.append(ENTRY.interest, state.interest || "");
+    payload.append(ENTRY.missingDuration, state.missingDuration || "");
+    payload.append(ENTRY.pain, state.pain || "");
+    payload.append(ENTRY.timeline, state.timeline || "");
+    payload.append(ENTRY.prefTime, state.prefTime || "");
+    payload.append(ENTRY.notes, "Submitted via Patient Concierge AI");
 
-  const payload = {
-    toEmail: state.demoEmail,
-    subject: `New Implant Lead ✅ (${CLINIC.name})`,
-    clinic: CLINIC.name,
-    name: state.name,
-    phone: state.phone,
-    email: state.email || "",
-    interest: state.interest,
-    missingDuration: state.missingDuration,
-    pain: state.pain,
-    timeline: state.timeline,
-    prefTime: state.prefTime,
-    formLink: (typeof FORM_LINK !== "undefined" ? FORM_LINK : ""),
-  };
-
-  // 🔥 This is the important part: App Script reads postData.contents.
-  // Using text/plain avoids CORS preflight.
-  await fetch(MAILER_URL, {
-  method: "POST",
-  mode: "no-cors",
-  headers: { "Content-Type": "text/plain;charset=utf-8" },
-  body: JSON.stringify(payload)
-});
-
-addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
-
-  // Debug proof in console
-  console.log("Demo mailer called for:", state.demoEmail);
-    addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
-}
+    await fetch(FORM_RESPONSE_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload.toString()
+    });
   }
 
+  // ----------------- DEMO EMAIL SENDER -----------------
   async function sendDemoEmailIfNeeded() {
     if (!DEMO_MODE || !state.demoEmail) return;
 
@@ -519,18 +506,22 @@ addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
       missingDuration: state.missingDuration,
       pain: state.pain,
       timeline: state.timeline,
-      prefTime: state.prefTime
+      prefTime: state.prefTime,
+      formLink: FORM_LINK
     };
 
-    // IMPORTANT: Use text/plain to avoid browser preflight/CORS issues.
     await fetch(MAILER_URL, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload)
     });
+
+    addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
+    console.log("Demo mailer called for:", state.demoEmail);
   }
 
+  // ----------------- FINISH + SUBMIT -----------------
   function finish() {
     addMsg("Perfect ✅ Thanks! Please review your details and submit your request.");
 
@@ -547,55 +538,33 @@ addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
 
     addMsg(summary, "bot");
 
-    const buttons = [
+    setButtons([
       { label: "Submit Request", value: "submit", className: "success" },
       { label: "Open Form (Backup)", value: "open", className: "secondary" }
-    ];
-
-    if (CLINIC.urgentWhatsApp && CLINIC.urgentWhatsApp.trim().length > 0) {
-      buttons.push({ label: "Urgent? WhatsApp Clinic", value: "wa", className: "warn" });
-    }
-
-    setButtons(buttons, async (v) => {
+    ], async (v) => {
       if (v === "open") {
         window.open(FORM_LINK, "_blank");
-        return;
-      }
-
-      if (v === "wa") {
-        const num = CLINIC.urgentWhatsApp.replace(/\s+/g, "");
-        const msg = encodeURIComponent("Hi, I submitted an implant consultation request. Could someone assist me?");
-        window.open(`https://wa.me/${num.replace("+","")}?text=${msg}`, "_blank");
         return;
       }
 
       addMsg("Submitting… ✅", "bot");
 
       try {
-        // 1) save to Sheets (Google Form)
         await submitToGoogleForm();
-
-        // 2) demo proof email to the demoer
         await sendDemoEmailIfNeeded();
 
         controls.innerHTML = "";
         const success = document.createElement("div");
         success.className = "successBox";
-
-        const extra = (DEMO_MODE && state.demoEmail)
-          ? ("<br/><br/><b>Demo:</b> A lead summary was sent to <b>" + state.demoEmail + "</b>. Check your inbox (and Spam).")
-          : "";
-
         success.innerHTML =
           "<b>✅ Request received.</b><br/>" +
           "Thank you. The clinic team will contact you shortly to confirm your consultation." +
-          extra +
-          "<br/><br/><span style='color:#065f46'>Tip:</span> Please keep your phone available for a call or WhatsApp message.";
+          "<br/><br/>If this is a demo, check your inbox/spam for the lead summary email.";
 
         controls.appendChild(success);
 
       } catch (err) {
-        addMsg("⚠️ Something went wrong submitting your request. Please tap 'Open Form (Backup)' to submit.", "bot");
+        addMsg("⚠️ Something went wrong. Please use 'Open Form (Backup)' to submit.", "bot");
       }
     });
   }
@@ -604,5 +573,6 @@ addMsg("✅ Demo email sent to: " + state.demoEmail, "bot");
   if (DEMO_MODE) demoAskEmail();
   else startPatientFlow();
 </script>
+
 </body>
 </html>
