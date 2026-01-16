@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Patient Concierge AI — Chat</title>
   <meta name="description" content="AI dental booking assistant that collects patient details and sends them to the clinic instantly." />
-
   <style>
     :root{
       --bg:#f6fbff;
@@ -35,7 +34,6 @@
       justify-content:center;
       padding:18px;
     }
-    a{color:inherit}
     .wrap{width:min(980px,100%); display:grid; grid-template-columns: 1fr 420px; gap:16px;}
     @media (max-width: 980px){ .wrap{grid-template-columns:1fr; } }
 
@@ -46,7 +44,6 @@
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-
     .topbar{
       padding:16px 18px;
       border-bottom:1px solid var(--border);
@@ -64,7 +61,6 @@
     }
     .brandTitle{font-weight:900; line-height:1.1;}
     .brandSub{color:var(--muted); font-size:12px;}
-
     .pill{
       font-size:12px;
       padding:7px 10px;
@@ -75,7 +71,6 @@
       white-space:nowrap;
     }
 
-    /* Chat */
     .chatArea{display:flex; flex-direction:column; height: 640px;}
     @media (max-width:980px){ .chatArea{height: 70vh;} }
 
@@ -95,20 +90,10 @@
       font-size:14px;
       line-height:1.35;
       border:1px solid var(--border);
+      white-space:pre-wrap;
     }
-    .bot .bubble{
-      background:#f1f5ff;
-      border-color: rgba(37,99,235,.18);
-    }
-    .user .bubble{
-      background:#ecfeff;
-      border-color: rgba(14,165,233,.18);
-    }
-    .meta{
-      font-size:11px;
-      color:var(--muted);
-      margin-top:4px;
-    }
+    .bot .bubble{background:#f1f5ff; border-color: rgba(37,99,235,.18);}
+    .user .bubble{background:#ecfeff; border-color: rgba(14,165,233,.18);}
 
     .composer{
       border-top:1px solid var(--border);
@@ -143,8 +128,7 @@
     }
     .btn:hover{transform: translateY(-1px); filter:brightness(1.02)}
     .btn:disabled{opacity:.55; cursor:not-allowed; transform:none;}
-        /* Side panel */
-    .side{padding:16px 16px 18px;}
+        .side{padding:16px 16px 18px;}
     .side h2{margin:0 0 8px; font-size:16px;}
     .side p{margin:0 0 12px; color:var(--muted); font-size:13px; line-height:1.55;}
     .box{
@@ -169,7 +153,6 @@
     .ok{color:var(--ok); font-weight:800;}
     .warn{color:var(--warn); font-weight:800;}
     .hr{height:1px; background:var(--border); margin:12px 0;}
-
     .quickBtns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
     .qbtn{
       padding:9px 10px;
@@ -213,7 +196,7 @@
       <div class="box" id="demoBox" style="display:none;">
         <div class="label">Demo email (where you want to receive the test booking)</div>
         <input class="field" id="demoEmail" type="email" placeholder="name@clinic.com" />
-        <div class="small">Used only for the demo test. Real clinics have their own routing.</div>
+        <div class="small">Used only for demo tests.</div>
       </div>
 
       <div class="box">
@@ -225,7 +208,7 @@
         </div>
         <div class="hr"></div>
         <div class="small">
-          <span class="ok">Tip:</span> Demo link is <b>?demo=1</b>. Clinic link is <b>?clinic=smileart</b>.
+          <span class="ok">Tip:</span> Demo is <b>?demo=1</b>. Clinic is <b>?clinic=smileart</b>.
         </div>
       </div>
 
@@ -237,20 +220,18 @@
   </div>
 
   <script>
-    /*********************************************************
-     * IMPORTANT: paste your Apps Script Web App EXEC URL here
-     *********************************************************/
-    const MAILER_URL = https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec;
+    // IMPORTANT: Your Apps Script Web App URL (/exec)
+    const MAILER_URL = "https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec";
 
     // Routing from URL
     const params = new URLSearchParams(location.search);
     const isDemo = params.get("demo") === "1";
     const clinic = (params.get("clinic") || "").trim().toLowerCase();
 
-    // UI setup
     const demoBox = document.getElementById("demoBox");
     const modeLine = document.getElementById("modeLine");
     const pill = document.getElementById("pill");
+
     if (isDemo) {
       demoBox.style.display = "block";
       modeLine.textContent = "Demo mode • sends to your email";
@@ -277,7 +258,8 @@
       preferredTime: "",
       contactMethod: "",
       notes: "",
-      demoEmail: ""
+      demoEmail: "",
+      submitting: false
     };
 
     function addMsg(text, who="bot") {
@@ -294,7 +276,7 @@
     function setStatus(html) {
       statusLine.innerHTML = html;
     }
-        // Simple script validation
+
     function mailerUrlLooksValid() {
       return typeof MAILER_URL === "string" && MAILER_URL.startsWith("https://script.google.com/macros/s/");
     }
@@ -302,50 +284,19 @@
     function normalizePhone(s) {
       return String(s || "").replace(/[^\d+]/g,"").trim();
     }
-
-    function askNext() {
-      // Step-based intake
+        function askNext() {
       if (state.step === 0) {
-        addMsg("Hi 👋 I’ll help you book a dental appointment. What service do you need?");
-        addMsg("Examples: Check-up, Cleaning, Filling, Root Canal, Braces, Whitening, Toothache, Implant, Emergency.");
-        state.step = 1;
-        return;
+        addMsg("Hi 👋 I’ll help you book a dental appointment.");
+        addMsg("What service do you need? (e.g., Check-up, Cleaning, Filling, Toothache, Braces, Whitening, Implant, Emergency)");
+        state.step = 1; return;
       }
-      if (state.step === 1) {
-        addMsg("Great — what’s your full name?");
-        state.step = 2;
-        return;
-      }
-      if (state.step === 2) {
-        addMsg("What’s the best phone number to reach you on?");
-        state.step = 3;
-        return;
-      }
-      if (state.step === 3) {
-        addMsg("Do you have an email you’d like us to use? (optional — type “skip” if not)");
-        state.step = 4;
-        return;
-      }
-      if (state.step === 4) {
-        addMsg("When would you prefer to be contacted? (Morning / Afternoon / Evening)");
-        state.step = 5;
-        return;
-      }
-      if (state.step === 5) {
-        addMsg("How should the clinic contact you? (WhatsApp / Call / Email)");
-        state.step = 6;
-        return;
-      }
-      if (state.step === 6) {
-        addMsg("Any notes or symptoms to share? (optional — type “skip” if none)");
-        state.step = 7;
-        return;
-      }
-      if (state.step === 7) {
-        // Ready to submit
-        submitPayload();
-        return;
-      }
+      if (state.step === 1) { addMsg("Great — what’s your full name?"); state.step = 2; return; }
+      if (state.step === 2) { addMsg("What’s the best phone number to reach you on?"); state.step = 3; return; }
+      if (state.step === 3) { addMsg("Do you have an email? (optional — type “skip” if not)"); state.step = 4; return; }
+      if (state.step === 4) { addMsg("Preferred contact time? (Morning / Afternoon / Evening)"); state.step = 5; return; }
+      if (state.step === 5) { addMsg("How should the clinic contact you? (WhatsApp / Call / Email)"); state.step = 6; return; }
+      if (state.step === 6) { addMsg("Any notes/symptoms? (optional — type “skip” if none)"); state.step = 7; return; }
+      if (state.step === 7) { submitPayload(); return; }
     }
 
     function handleUser(text) {
@@ -355,11 +306,11 @@
       // quick menu
       if (/^pricing$/i.test(t)) {
         addMsg("Pricing (Kenya): Intro month KSh 7,500 then KSh 10,000/month per clinic. Cancel anytime.");
-        addMsg("To activate for your clinic, we set a private dashboard + clinic link.");
+        addMsg("Includes: clinic email alerts + private dashboard + clinic link.");
         return;
       }
       if (/^how it works$/i.test(t)) {
-        addMsg("How it works: A patient chats for 60 seconds → clinic receives an email summary → it saves to a private Google Sheets dashboard for follow-up.");
+        addMsg("How it works: patient chats for ~60 seconds → clinic gets an email summary → lead is saved to a private Google Sheets dashboard for follow-up.");
         return;
       }
       if (/^start booking$/i.test(t)) {
@@ -368,51 +319,63 @@
         return;
       }
 
-      // Intake steps
+      // intake steps
       if (state.step === 1) { state.service = t; askNext(); return; }
       if (state.step === 2) { state.patientName = t; askNext(); return; }
       if (state.step === 3) { state.patientPhone = normalizePhone(t); askNext(); return; }
       if (state.step === 4) {
-        if (/^skip$/i.test(t)) state.patientEmail = "";
-        else state.patientEmail = t;
+        state.patientEmail = /^skip$/i.test(t) ? "" : t;
         askNext(); return;
       }
       if (state.step === 5) { state.preferredTime = t; askNext(); return; }
       if (state.step === 6) { state.contactMethod = t; askNext(); return; }
       if (state.step === 7) {
-        if (/^skip$/i.test(t)) state.notes = "";
-        else state.notes = t;
+        state.notes = /^skip$/i.test(t) ? "" : t;
         askNext(); return;
       }
 
-      // If user types before starting
+      // if user types before starting
       if (state.step === 0) {
         addMsg("No problem — let’s start ✅");
         askNext();
       }
     }
 
+    function makeSubmissionId() {
+      return Date.now() + "-" + Math.random().toString(16).slice(2);
+    }
+
     async function submitPayload() {
-      // Demo email requirement
+      // HARD lock: prevents double send even if events fire twice
+      if (state.submitting) return;
+      state.submitting = true;
+      sendBtn.disabled = true;
+      inputEl.disabled = true;
+
       if (isDemo) {
         const de = document.getElementById("demoEmail").value.trim();
         state.demoEmail = de;
         if (!de) {
           addMsg("Please enter a demo email on the right panel first ✅", "bot");
           setStatus('<span class="warn">Demo email required.</span>');
+          state.submitting = false;
+          sendBtn.disabled = false;
+          inputEl.disabled = false;
           return;
         }
       }
 
       if (!mailerUrlLooksValid()) {
         addMsg("⚠️ Setup issue: MAILER_URL is not set correctly.", "bot");
-        addMsg("Please paste your Apps Script /exec link into chat.html (MAILER_URL).", "bot");
         setStatus('<span class="warn">MAILER_URL not set.</span>');
+        state.submitting = false;
+        sendBtn.disabled = false;
+        inputEl.disabled = false;
         return;
       }
 
-      // Build payload (matches Apps Script router)
       const payload = {
+        submissionId: makeSubmissionId(),
         mode: isDemo ? "DEMO" : "LIVE",
         clinic: clinic || "",
         demoEmail: isDemo ? state.demoEmail : "",
@@ -427,13 +390,10 @@
         submittedAt: new Date().toISOString()
       };
 
-      // UX lock
-      sendBtn.disabled = true;
       setStatus('<span class="ok">Sending…</span>');
+      addMsg("✅ Thanks — submitting your request now…", "bot");
 
       try {
-        addMsg("✅ Thanks — submitting your request now…", "bot");
-
         await fetch(MAILER_URL, {
           method: "POST",
           mode: "no-cors",
@@ -447,11 +407,12 @@
         addMsg("⚠️ Something went wrong sending the request. Please try again.", "bot");
         setStatus('<span class="warn">Send failed.</span>');
       } finally {
+        state.submitting = false;
         sendBtn.disabled = false;
+        inputEl.disabled = false;
       }
     }
-        // Send button + enter handling
-    function sendNow() {
+        function sendNow() {
       const text = inputEl.value;
       inputEl.value = "";
       inputEl.style.height = "44px";
@@ -459,19 +420,24 @@
       handleUser(text);
     }
 
+    // Button click (single handler only)
     sendBtn.addEventListener("click", () => {
-      if (!inputEl.value.trim()) return;
+      const v = inputEl.value.trim();
+      if (!v) return;
       sendNow();
     });
 
+    // Enter to send (single handler only)
     inputEl.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        if (!inputEl.value.trim()) return;
+        const v = inputEl.value.trim();
+        if (!v) return;
         sendNow();
       }
     });
 
+    // Auto-grow textarea
     inputEl.addEventListener("input", () => {
       inputEl.style.height = "44px";
       inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + "px";
@@ -486,9 +452,9 @@
       });
     });
 
-    // Start conversation
+    // Start
     addMsg("Hi 👋 Welcome to Patient Concierge AI.");
-    addMsg("Tap “Start booking” or tell me what you need.");
+    addMsg("Tap “Start booking” or type what you need.");
   </script>
 </body>
 </html>
