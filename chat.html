@@ -444,6 +444,21 @@
 
       try {
         // Using no-cors to avoid browser CORS blocking
+        // ---- routing params (demo / clinic) ----
+const params = new URLSearchParams(location.search);
+const isDemo = params.get("demo") === "1";
+const clinic = (params.get("clinic") || "").trim();
+
+// Add routing to payload
+payload.mode = isDemo ? "DEMO" : "LIVE";
+if (clinic) payload.clinic = clinic;
+
+await fetch(MAILER_URL, {
+  method: "POST",
+  mode: "no-cors",
+  headers: { "Content-Type": "text/plain;charset=utf-8" },
+  body: JSON.stringify(payload)
+});
         await fetch(MAILER_URL, {
           method: "POST",
           mode: "no-cors",
