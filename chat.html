@@ -4,461 +4,436 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Patient Concierge AI — Chat</title>
-  <meta name="description" content="Patient Concierge AI — dental booking chatbot." />
+  <meta name="description" content="AI dental booking assistant that collects patient details and sends them to the clinic instantly." />
 
   <style>
     :root{
-      --bg:#f7fbff;
+      --bg:#f6fbff;
       --card:#ffffff;
       --text:#0f172a;
       --muted:#475569;
+      --border:rgba(15,23,42,.12);
+      --shadow:0 18px 60px rgba(2,6,23,.10);
       --brand:#2563eb;
       --brand2:#0ea5e9;
       --ok:#16a34a;
-      --border:rgba(15,23,42,.10);
-      --shadow:0 18px 55px rgba(2,6,23,.10);
-      --radius:18px;
-
-      --botBubble: rgba(37,99,235,.08);
-      --userBubble: rgba(22,163,74,.10);
+      --warn:#b45309;
+      --radius:20px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      color:var(--text);
       background:
-        radial-gradient(900px 600px at 20% 0%, rgba(14,165,233,.10), transparent 60%),
-        radial-gradient(900px 600px at 80% 0%, rgba(22,163,74,.10), transparent 60%),
-        linear-gradient(180deg,#ffffff,var(--bg));
+        radial-gradient(900px 600px at 20% 0%, #e9fff7, transparent 55%),
+        radial-gradient(900px 600px at 80% 0%, #eef4ff, transparent 55%),
+        linear-gradient(180deg,#fbfdff,#f6fffb);
+      color:var(--text);
       min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
     }
     a{color:inherit}
-
-    .wrap{max-width:980px;margin:0 auto;padding:18px 14px 26px}
-    .top{
-      display:flex;align-items:center;justify-content:space-between;gap:12px;
-      padding:10px 4px 14px;
-    }
-    .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .logo{
-      width:44px;height:44px;border-radius:16px;
-      background:linear-gradient(135deg,var(--brand),var(--brand2));
-      display:grid;place-items:center;
-      color:#fff;font-weight:900;letter-spacing:.4px;
-      box-shadow:0 14px 35px rgba(37,99,235,.20);
-      flex:0 0 auto;
-    }
-    .brandMeta{line-height:1.1}
-    .brandMeta b{display:block;font-size:15px}
-    .brandMeta small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
-    .pill{
-      display:inline-flex;align-items:center;gap:8px;
-      padding:8px 12px;border-radius:999px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.70);
-      color:var(--muted);font-size:13px;font-weight:700;
-      white-space:nowrap;
-    }
+    .wrap{width:min(980px,100%); display:grid; grid-template-columns: 1fr 420px; gap:16px;}
+    @media (max-width: 980px){ .wrap{grid-template-columns:1fr; } }
 
     .card{
       background:var(--card);
       border:1px solid var(--border);
-      border-radius:22px;
+      border-radius:var(--radius);
       box-shadow:var(--shadow);
       overflow:hidden;
     }
-    .cardTop{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:14px 14px;
+
+    .topbar{
+      padding:16px 18px;
       border-bottom:1px solid var(--border);
-      background:linear-gradient(180deg,#ffffff,#f4fbff);
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background: linear-gradient(180deg,#ffffff,#fbfdff);
     }
-    .cardTop .title{font-weight:900}
-    .status{display:flex;align-items:center;gap:8px;color:var(--ok);font-weight:900;font-size:12px}
-    .dot{width:8px;height:8px;border-radius:99px;background:var(--ok)}
-    .subhead{padding:10px 14px;color:var(--muted);font-size:13px;line-height:1.5;border-bottom:1px solid var(--border)}
+    .brand{display:flex; align-items:center; gap:10px;}
+    .logo{
+      width:42px;height:42px;border-radius:14px;
+      background: linear-gradient(135deg,var(--brand),var(--brand2));
+      display:grid; place-items:center;
+      color:#fff; font-weight:900; letter-spacing:.5px;
+      box-shadow:0 12px 30px rgba(37,99,235,.22);
+      user-select:none;
+    }
+    .brandTitle{font-weight:900; line-height:1.1;}
+    .brandSub{color:var(--muted); font-size:12px;}
 
-    .chat{
-      height:min(62vh, 520px);
-      overflow:auto;
-      padding:14px;
-      background:linear-gradient(180deg,#ffffff,#fbfeff);
-    }
-    .row{display:flex;margin:10px 0}
-    .row.bot{justify-content:flex-start}
-    .row.user{justify-content:flex-end}
-    .bubble{
-      max-width:min(78%, 520px);
-      padding:10px 12px;
-      border-radius:14px;
-      font-size:13px;
-      line-height:1.4;
+    .pill{
+      font-size:12px;
+      padding:7px 10px;
+      border-radius:999px;
       border:1px solid var(--border);
-      box-shadow:0 6px 18px rgba(2,6,23,.04);
-      white-space:pre-wrap;
+      color:var(--muted);
+      background:rgba(255,255,255,.8);
+      white-space:nowrap;
     }
-    .bot .bubble{background:var(--botBubble)}
-    .user .bubble{background:var(--userBubble)}
 
-    .inputBar{
+    /* Chat */
+    .chatArea{display:flex; flex-direction:column; height: 640px;}
+    @media (max-width:980px){ .chatArea{height: 70vh;} }
+
+    .messages{
+      padding:14px 14px 0;
+      overflow:auto;
+      flex:1 1 auto;
+    }
+    .msgRow{display:flex; margin:10px 0;}
+    .msgRow.bot{justify-content:flex-start;}
+    .msgRow.user{justify-content:flex-end;}
+
+    .bubble{
+      max-width: 86%;
+      padding:11px 12px;
+      border-radius:16px;
+      font-size:14px;
+      line-height:1.35;
+      border:1px solid var(--border);
+    }
+    .bot .bubble{
+      background:#f1f5ff;
+      border-color: rgba(37,99,235,.18);
+    }
+    .user .bubble{
+      background:#ecfeff;
+      border-color: rgba(14,165,233,.18);
+    }
+    .meta{
+      font-size:11px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+
+    .composer{
       border-top:1px solid var(--border);
       padding:12px;
-      display:flex;gap:10px;align-items:flex-end;
-      background:#fff;
+      display:flex;
+      gap:10px;
+      align-items:flex-end;
+      background:#ffffff;
     }
-    .field{
-      flex:1;
-      display:flex;flex-direction:column;gap:6px;
-    }
-    .label{font-size:12px;color:var(--muted);font-weight:700}
-    .inp, .sel, .txt{
+    textarea{
       width:100%;
+      resize:none;
       border:1px solid var(--border);
       border-radius:14px;
-      padding:12px 12px;
+      padding:10px 10px;
+      font-size:14px;
+      outline:none;
+      min-height:44px;
+      max-height:120px;
+    }
+    textarea:focus{border-color: rgba(37,99,235,.35);}
+    .btn{
+      appearance:none; border:0; cursor:pointer;
+      padding:11px 14px;
+      border-radius:14px;
+      font-weight:900;
+      color:#fff;
+      background: linear-gradient(135deg,var(--brand),var(--brand2));
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); filter:brightness(1.02)}
+    .btn:disabled{opacity:.55; cursor:not-allowed; transform:none;}
+        /* Side panel */
+    .side{padding:16px 16px 18px;}
+    .side h2{margin:0 0 8px; font-size:16px;}
+    .side p{margin:0 0 12px; color:var(--muted); font-size:13px; line-height:1.55;}
+    .box{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      background:#fbfdff;
+      margin-top:10px;
+    }
+    .label{font-size:12px; color:var(--muted); margin-bottom:6px;}
+    .field{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px 10px;
       font-size:14px;
       outline:none;
       background:#fff;
     }
-    .txt{min-height:44px;resize:vertical}
-    .btn{
-      appearance:none;border:0;cursor:pointer;text-decoration:none;
-      display:inline-flex;align-items:center;justify-content:center;gap:10px;
-      padding:12px 14px;border-radius:14px;font-weight:900;
-      transition: transform .08s ease, filter .2s ease, background .2s ease;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .btn:hover{transform:translateY(-1px);filter:brightness(1.02)}
-    .btnPrimary{background:linear-gradient(135deg,var(--brand),var(--brand2)); color:#fff}
-    .btnGhost{background:#fff;border:1px solid var(--border); color:var(--text)}
-    .btnSmall{padding:10px 12px;border-radius:12px;font-size:13px}
+    .field:focus{border-color: rgba(37,99,235,.35);}
+    .small{font-size:12px; color:var(--muted); margin-top:8px;}
+    .ok{color:var(--ok); font-weight:800;}
+    .warn{color:var(--warn); font-weight:800;}
+    .hr{height:1px; background:var(--border); margin:12px 0;}
 
-    .quick{
-      display:flex;flex-wrap:wrap;gap:8px;
-      padding:12px 14px;
-      border-top:1px solid var(--border);
-      background:rgba(255,255,255,.7);
-    }
+    .quickBtns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
     .qbtn{
+      padding:9px 10px;
+      border-radius:999px;
       border:1px solid var(--border);
       background:#fff;
-      border-radius:999px;
-      padding:8px 10px;
-      font-weight:800;
-      font-size:13px;
       cursor:pointer;
+      font-size:13px;
+      font-weight:800;
     }
-    .qbtn:hover{filter:brightness(1.02)}
-    .muted{color:var(--muted)}
-    .footerNote{margin-top:12px;color:var(--muted);font-size:12px;text-align:center;line-height:1.5}
+    .qbtn:hover{border-color: rgba(37,99,235,.35);}
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <div class="top">
-      <a class="brand" href="./">
-        <div class="logo">PC</div>
-        <div class="brandMeta">
-          <b>Patient Concierge AI</b>
-          <small>Dental Booking Chatbot</small>
+    <div class="card chatArea">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">PC</div>
+          <div>
+            <div class="brandTitle">Patient Concierge AI</div>
+            <div class="brandSub" id="modeLine">Dental booking assistant</div>
+          </div>
         </div>
-      </a>
-      <div id="modePill" class="pill">✅ Ready</div>
-    </div>
-
-    <div class="card">
-      <div class="cardTop">
-        <div class="title">Chat Intake</div>
-        <div class="status"><span class="dot"></span> Online</div>
-      </div>
-      <div class="subhead">
-        This chat collects your request and sends it to the clinic instantly.
-        <span class="muted">Final suitability and pricing are confirmed by the clinic.</span>
+        <div class="pill" id="pill">● Online</div>
       </div>
 
-      <div id="chat" class="chat"></div>
+      <div class="messages" id="messages"></div>
 
-      <div id="quick" class="quick" style="display:none;"></div>
-
-      <div class="inputBar">
-        <div class="field">
-          <div id="inputLabel" class="label">Your answer</div>
-          <input id="input" class="inp" placeholder="Type here…" autocomplete="off" />
-        </div>
-        <button id="sendBtn" class="btn btnPrimary">Send</button>
+      <div class="composer">
+        <textarea id="input" placeholder="Type here…" rows="1"></textarea>
+        <button class="btn" id="sendBtn">Send</button>
       </div>
     </div>
 
-    <div class="footerNote">
-      Tip for clinics: share the demo link <b>chat.html?demo=1</b> so they can enter their email and test it.
+    <div class="card side">
+      <h2>Booking Intake</h2>
+      <p>This assistant collects patient details and sends them to the clinic instantly.</p>
+
+      <div class="box" id="demoBox" style="display:none;">
+        <div class="label">Demo email (where you want to receive the test booking)</div>
+        <input class="field" id="demoEmail" type="email" placeholder="name@clinic.com" />
+        <div class="small">Used only for the demo test. Real clinics have their own routing.</div>
+      </div>
+
+      <div class="box">
+        <div class="label">Quick actions</div>
+        <div class="quickBtns">
+          <button class="qbtn" data-quick="Start booking">Start booking</button>
+          <button class="qbtn" data-quick="Pricing">Pricing</button>
+          <button class="qbtn" data-quick="How it works">How it works</button>
+        </div>
+        <div class="hr"></div>
+        <div class="small">
+          <span class="ok">Tip:</span> Demo link is <b>?demo=1</b>. Clinic link is <b>?clinic=smileart</b>.
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="label">Status</div>
+        <div class="small" id="statusLine"><span class="ok">Ready.</span></div>
+      </div>
     </div>
   </div>
-    <script>
-    // =========================
-    // CONFIG (already your live Apps Script URL)
-    // =========================
-    const MAILER_URL = "https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec";
 
-    // =========================
-    // STATE
-    // =========================
-    const qs = new URLSearchParams(location.search);
-    const isDemo = qs.get("demo") === "1";
+  <script>
+    /*********************************************************
+     * IMPORTANT: paste your Apps Script Web App EXEC URL here
+     *********************************************************/
+    const MAILER_URL = https://script.google.com/macros/s/AKfycbwobfSvAaRJi7XKOekFQf5a7uVDIFaYwdsFkHnEsn35sQNFWgsZQtzwqNJAaGNxRcEE/exec;
+
+    // Routing from URL
+    const params = new URLSearchParams(location.search);
+    const isDemo = params.get("demo") === "1";
+    const clinic = (params.get("clinic") || "").trim().toLowerCase();
+
+    // UI setup
+    const demoBox = document.getElementById("demoBox");
+    const modeLine = document.getElementById("modeLine");
+    const pill = document.getElementById("pill");
+    if (isDemo) {
+      demoBox.style.display = "block";
+      modeLine.textContent = "Demo mode • sends to your email";
+      pill.textContent = "● Demo";
+    } else if (clinic) {
+      modeLine.textContent = "Clinic mode • " + clinic;
+      pill.textContent = "● Live";
+    } else {
+      modeLine.textContent = "Live mode • booking assistant";
+      pill.textContent = "● Live";
+    }
+
+    const messagesEl = document.getElementById("messages");
+    const inputEl = document.getElementById("input");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusLine = document.getElementById("statusLine");
 
     const state = {
-      mode: isDemo ? "DEMO" : "LIVE",
-      demoEmail: "",
+      step: 0,
       service: "",
       patientName: "",
       patientPhone: "",
       patientEmail: "",
       preferredTime: "",
+      contactMethod: "",
       notes: "",
-      sourcePage: document.referrer || location.href
+      demoEmail: ""
     };
 
-    const chatEl = document.getElementById("chat");
-    const quickEl = document.getElementById("quick");
-    const inputEl = document.getElementById("input");
-    const sendBtn = document.getElementById("sendBtn");
-    const inputLabel = document.getElementById("inputLabel");
-    const modePill = document.getElementById("modePill");
-
-    modePill.textContent = isDemo ? "🧪 Demo mode" : "✅ Live mode";
-
-    // =========================
-    // UI HELPERS
-    // =========================
-    function scrollDown() {
-      chatEl.scrollTop = chatEl.scrollHeight;
-    }
-
-    function addMsg(text, who = "bot") {
+    function addMsg(text, who="bot") {
       const row = document.createElement("div");
-      row.className = "row " + (who === "user" ? "user" : "bot");
+      row.className = "msgRow " + who;
       const bubble = document.createElement("div");
       bubble.className = "bubble";
       bubble.textContent = text;
       row.appendChild(bubble);
-      chatEl.appendChild(row);
-      scrollDown();
+      messagesEl.appendChild(row);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
-    function setQuickButtons(options) {
-      quickEl.innerHTML = "";
-      if (!options || !options.length) {
-        quickEl.style.display = "none";
-        return;
-      }
-      quickEl.style.display = "flex";
-      options.forEach(opt => {
-        const b = document.createElement("button");
-        b.className = "qbtn";
-        b.type = "button";
-        b.textContent = opt;
-        b.onclick = () => {
-          addMsg(opt, "user");
-          quickEl.style.display = "none";
-          handleAnswer(opt);
-        };
-        quickEl.appendChild(b);
-      });
+    function setStatus(html) {
+      statusLine.innerHTML = html;
     }
-
-    function setInput(placeholder, label="Your answer", type="text") {
-      inputLabel.textContent = label;
-      inputEl.placeholder = placeholder;
-      inputEl.type = type;
-      inputEl.value = "";
-      inputEl.focus();
-    }
-
-    function isValidEmail(s) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s).trim());
+        // Simple script validation
+    function mailerUrlLooksValid() {
+      return typeof MAILER_URL === "string" && MAILER_URL.startsWith("https://script.google.com/macros/s/");
     }
 
     function normalizePhone(s) {
-      return String(s).trim();
+      return String(s || "").replace(/[^\d+]/g,"").trim();
     }
 
-    // =========================
-    // FLOW (simple state machine)
-    // =========================
-    const steps = [];
-    let stepIndex = 0;
-
-    function buildSteps() {
-      steps.length = 0;
-
-      if (isDemo) {
-        steps.push({
-          key: "demoEmail",
-          bot: "Demo setup: what email should receive the test lead summary?",
-          placeholder: "Enter your email (e.g. clinic@email.com)",
-          label: "Clinic email for demo",
-          validate: (v) => isValidEmail(v) || "Please enter a valid email address."
-        });
+    function askNext() {
+      // Step-based intake
+      if (state.step === 0) {
+        addMsg("Hi 👋 I’ll help you book a dental appointment. What service do you need?");
+        addMsg("Examples: Check-up, Cleaning, Filling, Root Canal, Braces, Whitening, Toothache, Implant, Emergency.");
+        state.step = 1;
+        return;
       }
-
-      steps.push({
-        key: "service",
-        bot: "What do you need help with today?",
-        placeholder: "Choose a service…",
-        label: "Service",
-        quick: [
-          "Checkup / cleaning",
-          "Tooth pain / emergency",
-          "Filling / cavity",
-          "Root canal",
-          "Extraction",
-          "Braces / orthodontics",
-          "Whitening",
-          "Implants",
-          "Kids dentistry",
-          "Other"
-        ],
-        validate: (v) => String(v).trim().length > 1 || "Please choose a service."
-      });
-
-      steps.push({
-        key: "patientName",
-        bot: "Thanks. What’s your full name?",
-        placeholder: "Type your name",
-        label: "Full name",
-        validate: (v) => String(v).trim().length >= 2 || "Please enter your name."
-      });
-
-      steps.push({
-        key: "patientPhone",
-        bot: "Great. What phone number should we call or WhatsApp?",
-        placeholder: "e.g. 0712 345 678",
-        label: "Phone number",
-        validate: (v) => String(v).trim().length >= 7 || "Please enter a phone number."
-      });
-
-      steps.push({
-        key: "patientEmail",
-        bot: "Optional: what email address should we use (if any)?\n(You can type “skip” to continue.)",
-        placeholder: "Type email or 'skip'",
-        label: "Email (optional)",
-        validate: (v) => {
-          const t = String(v).trim().toLowerCase();
-          if (t === "skip" || t === "") return true;
-          return isValidEmail(v) || "Please enter a valid email, or type 'skip'.";
-        }
-      });
-
-      steps.push({
-        key: "preferredTime",
-        bot: "When do you prefer to be contacted?",
-        placeholder: "Choose a time…",
-        label: "Preferred contact time",
-        quick: ["Morning", "Afternoon", "Evening", "Anytime"],
-        validate: (v) => String(v).trim().length > 1 || "Please choose a preferred time."
-      });
-
-      steps.push({
-        key: "notes",
-        bot: "Any extra notes for the clinic? (Symptoms, duration, urgency)\n(You can type “none”.)",
-        placeholder: "Type notes…",
-        label: "Notes",
-        validate: (v) => String(v).trim().length >= 2 || "Please type a short note (or 'none')."
-      });
-    }
-          function start() {
-      buildSteps();
-      addMsg("Hi 👋 I’ll help you request a dental appointment.");
-      if (isDemo) {
-        addMsg("This is a demo. You’ll enter a clinic email first, then complete the patient chat.");
+      if (state.step === 1) {
+        addMsg("Great — what’s your full name?");
+        state.step = 2;
+        return;
       }
-      askCurrentStep();
-    }
-
-    function askCurrentStep() {
-      const step = steps[stepIndex];
-      if (!step) return;
-
-      addMsg(step.bot, "bot");
-
-      if (step.quick) {
-        setQuickButtons(step.quick);
-        // Also allow typing
-        setInput(step.placeholder || "Type here…", step.label || "Your answer");
-      } else {
-        setQuickButtons(null);
-        setInput(step.placeholder || "Type here…", step.label || "Your answer");
+      if (state.step === 2) {
+        addMsg("What’s the best phone number to reach you on?");
+        state.step = 3;
+        return;
+      }
+      if (state.step === 3) {
+        addMsg("Do you have an email you’d like us to use? (optional — type “skip” if not)");
+        state.step = 4;
+        return;
+      }
+      if (state.step === 4) {
+        addMsg("When would you prefer to be contacted? (Morning / Afternoon / Evening)");
+        state.step = 5;
+        return;
+      }
+      if (state.step === 5) {
+        addMsg("How should the clinic contact you? (WhatsApp / Call / Email)");
+        state.step = 6;
+        return;
+      }
+      if (state.step === 6) {
+        addMsg("Any notes or symptoms to share? (optional — type “skip” if none)");
+        state.step = 7;
+        return;
+      }
+      if (state.step === 7) {
+        // Ready to submit
+        submitPayload();
+        return;
       }
     }
 
-    function handleAnswer(ansRaw) {
-      const step = steps[stepIndex];
-      if (!step) return;
+    function handleUser(text) {
+      const t = String(text || "").trim();
+      if (!t) return;
 
-      const ans = String(ansRaw || "").trim();
-
-      // Validate
-      const ok = step.validate ? step.validate(ans) : true;
-      if (ok !== true) {
-        addMsg("❗ " + ok, "bot");
+      // quick menu
+      if (/^pricing$/i.test(t)) {
+        addMsg("Pricing (Kenya): Intro month KSh 7,500 then KSh 10,000/month per clinic. Cancel anytime.");
+        addMsg("To activate for your clinic, we set a private dashboard + clinic link.");
+        return;
+      }
+      if (/^how it works$/i.test(t)) {
+        addMsg("How it works: A patient chats for 60 seconds → clinic receives an email summary → it saves to a private Google Sheets dashboard for follow-up.");
+        return;
+      }
+      if (/^start booking$/i.test(t)) {
+        if (state.step === 0) askNext();
+        else addMsg("We’re already booking ✅ please answer the last question.");
         return;
       }
 
-      // Store
-      if (step.key === "patientEmail") {
-        const t = ans.toLowerCase();
-        state.patientEmail = (t === "skip" || t === "") ? "" : ans;
-      } else if (step.key === "patientPhone") {
-        state.patientPhone = normalizePhone(ans);
-      } else {
-        state[step.key] = ans;
+      // Intake steps
+      if (state.step === 1) { state.service = t; askNext(); return; }
+      if (state.step === 2) { state.patientName = t; askNext(); return; }
+      if (state.step === 3) { state.patientPhone = normalizePhone(t); askNext(); return; }
+      if (state.step === 4) {
+        if (/^skip$/i.test(t)) state.patientEmail = "";
+        else state.patientEmail = t;
+        askNext(); return;
+      }
+      if (state.step === 5) { state.preferredTime = t; askNext(); return; }
+      if (state.step === 6) { state.contactMethod = t; askNext(); return; }
+      if (state.step === 7) {
+        if (/^skip$/i.test(t)) state.notes = "";
+        else state.notes = t;
+        askNext(); return;
       }
 
-      // Next
-      stepIndex++;
-
-      if (stepIndex < steps.length) {
-        askCurrentStep();
-      } else {
-        finishAndSend();
+      // If user types before starting
+      if (state.step === 0) {
+        addMsg("No problem — let’s start ✅");
+        askNext();
       }
     }
 
-    async function finishAndSend() {
-      setQuickButtons(null);
-      addMsg("Perfect. Sending your request to the clinic now… ✅", "bot");
+    async function submitPayload() {
+      // Demo email requirement
+      if (isDemo) {
+        const de = document.getElementById("demoEmail").value.trim();
+        state.demoEmail = de;
+        if (!de) {
+          addMsg("Please enter a demo email on the right panel first ✅", "bot");
+          setStatus('<span class="warn">Demo email required.</span>');
+          return;
+        }
+      }
 
+      if (!mailerUrlLooksValid()) {
+        addMsg("⚠️ Setup issue: MAILER_URL is not set correctly.", "bot");
+        addMsg("Please paste your Apps Script /exec link into chat.html (MAILER_URL).", "bot");
+        setStatus('<span class="warn">MAILER_URL not set.</span>');
+        return;
+      }
+
+      // Build payload (matches Apps Script router)
       const payload = {
-        submittedAt: new Date().toISOString(),
-        mode: state.mode,
-        demoEmail: state.demoEmail || "",
-        service: state.service || "",
-        patientName: state.patientName || "",
-        patientPhone: state.patientPhone || "",
-        patientEmail: state.patientEmail || "",
-        preferredTime: state.preferredTime || "",
-        notes: state.notes || "",
-        sourcePage: state.sourcePage || ""
+        mode: isDemo ? "DEMO" : "LIVE",
+        clinic: clinic || "",
+        demoEmail: isDemo ? state.demoEmail : "",
+        service: state.service,
+        patientName: state.patientName,
+        patientPhone: state.patientPhone,
+        patientEmail: state.patientEmail,
+        preferredTime: state.preferredTime,
+        contactMethod: state.contactMethod,
+        notes: state.notes,
+        sourcePage: location.href,
+        submittedAt: new Date().toISOString()
       };
 
+      // UX lock
+      sendBtn.disabled = true;
+      setStatus('<span class="ok">Sending…</span>');
+
       try {
-        // Using no-cors to avoid browser CORS blocking
-        // ---- routing params (demo / clinic) ----
-const params = new URLSearchParams(location.search);
-const isDemo = params.get("demo") === "1";
-const clinic = (params.get("clinic") || "").trim();
+        addMsg("✅ Thanks — submitting your request now…", "bot");
 
-// Add routing to payload
-payload.mode = isDemo ? "DEMO" : "LIVE";
-if (clinic) payload.clinic = clinic;
-
-await fetch(MAILER_URL, {
-  method: "POST",
-  mode: "no-cors",
-  headers: { "Content-Type": "text/plain;charset=utf-8" },
-  body: JSON.stringify(payload)
-});
         await fetch(MAILER_URL, {
           method: "POST",
           mode: "no-cors",
@@ -466,79 +441,54 @@ await fetch(MAILER_URL, {
           body: JSON.stringify(payload)
         });
 
-        if (isDemo) {
-          addMsg(
-            "✅ Demo email sent to: " + state.demoEmail +
-            "\n\nIf you didn’t receive it, check Spam/Junk. You can run the demo again anytime.",
-            "bot"
-          );
-        } else {
-          addMsg("✅ Sent. The clinic will contact you soon.", "bot");
-        }
-
-        addMsg(
-          "Summary:\n" +
-          "• Service: " + state.service + "\n" +
-          "• Name: " + state.patientName + "\n" +
-          "• Phone: " + state.patientPhone + "\n" +
-          "• Preferred time: " + state.preferredTime,
-          "bot"
-        );
-
-        // Offer restart
-        addMsg("Would you like to submit another request?", "bot");
-        setQuickButtons(["Start again"]);
-        const btn = quickEl.querySelector(".qbtn");
-        if (btn) {
-          btn.onclick = () => {
-            quickEl.style.display = "none";
-            resetChat();
-          };
-        }
+        addMsg("✅ Submitted successfully. The clinic will contact you shortly.", "bot");
+        setStatus('<span class="ok">Sent.</span>');
       } catch (err) {
-        addMsg("❗ Something went wrong while sending. Please try again in a moment.", "bot");
+        addMsg("⚠️ Something went wrong sending the request. Please try again.", "bot");
+        setStatus('<span class="warn">Send failed.</span>');
+      } finally {
+        sendBtn.disabled = false;
       }
     }
-
-    function resetChat() {
-      // Clear chat UI + restart state (keep demo mode)
-      chatEl.innerHTML = "";
-      stepIndex = 0;
-
-      state.service = "";
-      state.patientName = "";
-      state.patientPhone = "";
-      state.patientEmail = "";
-      state.preferredTime = "";
-      state.notes = "";
-
-      // Keep demoEmail in demo so they don’t retype
-      if (!isDemo) state.demoEmail = "";
-
-      start();
+        // Send button + enter handling
+    function sendNow() {
+      const text = inputEl.value;
+      inputEl.value = "";
+      inputEl.style.height = "44px";
+      addMsg(text, "user");
+      handleUser(text);
     }
 
-    // =========================
-    // EVENTS
-    // =========================
-    function onSend() {
-      const v = inputEl.value.trim();
-      if (!v) return;
-      addMsg(v, "user");
-      setQuickButtons(null);
-      handleAnswer(v);
-    }
+    sendBtn.addEventListener("click", () => {
+      if (!inputEl.value.trim()) return;
+      sendNow();
+    });
 
-    sendBtn.addEventListener("click", onSend);
     inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        onSend();
+        if (!inputEl.value.trim()) return;
+        sendNow();
       }
     });
 
-    // Start the chat
-    start();
+    inputEl.addEventListener("input", () => {
+      inputEl.style.height = "44px";
+      inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + "px";
+    });
+
+    // Quick buttons
+    document.querySelectorAll(".qbtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const t = btn.getAttribute("data-quick");
+        addMsg(t, "user");
+        handleUser(t);
+      });
+    });
+
+    // Start conversation
+    addMsg("Hi 👋 Welcome to Patient Concierge AI.");
+    addMsg("Tap “Start booking” or tell me what you need.");
   </script>
-  </body>
+</body>
 </html>
